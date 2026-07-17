@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 
 export const revalidate = 60;
@@ -12,46 +13,87 @@ export default async function SermonPage({ params }: { params: Promise<{ slug: s
   if (!sermon) return notFound();
 
   return (
-    <article className="min-h-screen">
-      <section className="bg-cream py-20 border-b border-line">
-        <div className="wrap text-center">
-          <span className="text-gold-dark text-sm font-semibold tracking-widest uppercase">
-            {sermon.category}
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4">{sermon.title}</h1>
+    <article className="min-h-screen bg-paper">
+      {/* Page hero — matches .phero from template */}
+      <section className="bg-cream text-center border-b border-line" style={{ padding: "80px 0" }}>
+        <div className="wrap" style={{ maxWidth: 820 }}>
+          {sermon.category && (
+            <div className="font-sans text-[.78rem] tracking-[.22em] uppercase text-gold-dark font-semibold mb-[14px]">
+              {sermon.category}
+            </div>
+          )}
+          <h1
+            className="font-serif font-semibold leading-[1.15] text-ink mb-[10px]"
+            style={{ fontSize: "clamp(1.9rem,4vw,2.6rem)" }}
+          >
+            {sermon.title}
+          </h1>
           {sermon.scriptureRef && (
-            <p className="text-muted italic font-serif text-lg">{sermon.scriptureRef}</p>
+            <p className="font-serif italic text-[1.15rem] text-gold-dark mt-[10px]">
+              {sermon.scriptureRef}
+            </p>
           )}
         </div>
       </section>
 
+      {/* Content */}
       <section className="section-padding">
-        <div className="wrap max-w-3xl mx-auto">
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          {/* Divider below scripture ref */}
+          <div className="border-b border-line mb-[32px]" />
+
           {sermon.audioUrl && (
-            <div className="mb-8">
-              <audio controls className="w-full">
+            <div className="mb-[32px]">
+              <audio controls className="w-full rounded-[10px]">
                 <source src={sermon.audioUrl} type="audio/mpeg" />
-                Your browser does not support the audio element.
               </audio>
             </div>
           )}
 
           {sermon.videoUrl && (
-            <div className="mb-8 aspect-video">
+            <div className="mb-[32px] aspect-video rounded overflow-hidden">
               <iframe
                 src={sermon.videoUrl}
-                className="w-full h-full rounded"
+                className="w-full h-full"
                 allowFullScreen
               />
             </div>
           )}
 
-          {sermon.body && (
-            <div
-              className="prose prose-lg max-w-none prose-headings:font-serif prose-h2:text-2xl prose-h3:text-xl prose-blockquote:border-l-4 prose-blockquote:border-gold prose-blockquote:pl-4 prose-blockquote:italic prose-a:text-gold"
-              dangerouslySetInnerHTML={{ __html: sermon.body }}
+          {sermon.imageUrl && !sermon.videoUrl && (
+            <img
+              src={sermon.imageUrl}
+              alt={sermon.title}
+              className="w-full rounded mb-[32px]"
+              style={{ aspectRatio: "16/9", objectFit: "cover" }}
             />
           )}
+
+          {sermon.description && (
+            <p className="font-serif italic text-[1.18rem] text-ink mb-[28px] pb-[28px] border-b border-line">
+              {sermon.description}
+            </p>
+          )}
+
+          {sermon.body ? (
+            <div
+              className="prose prose-lg max-w-none prose-headings:font-serif prose-h2:text-[1.8rem] prose-h3:text-[1.4rem] prose-blockquote:border-l-4 prose-blockquote:border-gold prose-blockquote:pl-4 prose-blockquote:italic prose-a:text-gold prose-p:text-[1.05rem] prose-p:leading-[1.8]"
+              style={{ color: "#3a352e" }}
+              dangerouslySetInnerHTML={{ __html: sermon.body }}
+            />
+          ) : (
+            <p className="text-muted italic">No content available for this sermon yet.</p>
+          )}
+
+          {/* Back link */}
+          <div className="mt-[48px] pt-[32px] border-t border-line">
+            <Link
+              href="/sermons"
+              className="inline-block font-semibold text-[.9rem] text-burgundy hover:text-gold-dark transition-colors"
+            >
+              ← Back to all sermons
+            </Link>
+          </div>
         </div>
       </section>
     </article>

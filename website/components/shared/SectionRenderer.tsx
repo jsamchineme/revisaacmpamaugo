@@ -156,7 +156,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                           title={s.title}
                           description={s.description ?? ""}
                           linkLabel="Watch / Listen →"
-                          onLinkClick={() => {}}
+                          href={`/sermons/${s.slug}`}
                         />
                       ))}
                     </div>
@@ -198,7 +198,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                           title={e.title}
                           description={e.excerpt ?? ""}
                           linkLabel="Read More →"
-                          onLinkClick={() => {}}
+                          href={`/events/${e.slug}`}
                         />
                       ))}
                     </div>

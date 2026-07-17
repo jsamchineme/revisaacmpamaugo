@@ -43,12 +43,12 @@ async function main() {
           type: "hero",
           order: 0,
           content: {
-            headline: "Faithful Service. Timeless Truth.",
+            headline: "Faithful Service.<br/>Timeless Truth.",
             subheadline:
               "For over 50 years, Rev. Isaac Mpamaugo has preached the Gospel and shepherded God\u2019s people. Today he and his wife Rev. Edith Mpamaugo share a lifetime of sermons and teaching with all who are seeking.",
             buttons: [
               { label: "Listen to a Sermon", href: "/sermons", variant: "gold" },
-              { label: "Get weekly teachings", href: "/teachings", variant: "ghost" },
+              { label: "Get in Touch", href: "/contact", variant: "ghost" },
             ],
           },
         },
@@ -59,9 +59,9 @@ async function main() {
           content: {
             stats: [
               { number: "50+", label: "Years in Ministry" },
-              { number: "200+", label: "Congregations Served" },
+              { number: "200", label: "Congregations Served" },
               { number: "Hundreds", label: "Sermons & Teachings" },
-              { number: "50+", label: "Years Together in Ministry" },
+              { number: "50", label: "Years of Shared Ministry" },
             ],
           },
         },
@@ -70,8 +70,8 @@ async function main() {
           type: "featuresGrid",
           order: 2,
           content: {
+            eyebrow: "OUR PURPOSE",
             title: "A Lifetime of Faithfulness",
-            subtitle: "Decades of faithful ministry, gathered in one place.",
             features: [
               {
                 icon: "book",
@@ -81,7 +81,7 @@ async function main() {
               },
               {
                 icon: "lamp",
-                title: "Teaching Rooted in Scripture",
+                title: "Rooted in Scripture",
                 description:
                   "Clear, practical Bible teaching for everyday Christian living, marriage, and family.",
               },
@@ -99,8 +99,12 @@ async function main() {
           type: "aboutPreview",
           order: 3,
           content: {
+            eyebrow: "Our Story",
             headline: "A Life Given to the Gospel",
-            body: "Rev. Isaac Mpamaugo answered the call to ministry as a young man and has spent his life pointing people to Christ. Alongside his wife Rev. Mrs. Edith Mpamaugo, he has pastored, taught, counseled, and prayed with countless families. Though now retired from the pulpit, his calling has never stopped — it simply found a new way to reach you.",
+            body: "Rev. Isaac Mpamaugo answered the call to ministry as a young man and has spent his life pointing people to Christ. Alongside his wife Rev. Mrs. Edith Mpamaugo, he has pastored, taught, counseled, and prayed with countless families.",
+            extraParagraphs: [
+              "Though now retired from the pulpit, his calling has never stopped — it simply found a new way to reach you.",
+            ],
             ctaLabel: "Read Their Story",
             ctaLink: "/about",
           },
@@ -110,7 +114,8 @@ async function main() {
           type: "sermonsPreview",
           order: 4,
           content: {
-            title: "Recent Sermons & Teachings",
+            eyebrow: "Recent",
+            title: "Sermons & Teachings",
             subtitle: "Messages of hope, faith, and the steadfast love of God.",
             count: 3,
           },
@@ -120,9 +125,10 @@ async function main() {
           type: "eventsPreview",
           order: 5,
           content: {
+            eyebrow: "In the field",
             title: "Outreach & Events",
             subtitle:
-              "Where the ministry is at work — past gatherings, evangelism, and care for the community.",
+              "Where the ministry is at work — gatherings, evangelism, and care for the community.",
             count: 3,
           },
         },
@@ -419,6 +425,7 @@ async function main() {
 
   // ─── Sermons ────────────────────────────────────────────────────────────────
 
+  const IMG = "https://images.unsplash.com/";
   const sermons = [
     {
       slug: "the-anchor-that-holds",
@@ -426,6 +433,7 @@ async function main() {
       description: "Where to stand when life shakes everything you trusted.",
       category: "Faith & Hope",
       scriptureRef: "Hebrews 6:19",
+      imageUrl: `${IMG}photo-1500627964684-141351970a7f?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -434,6 +442,7 @@ async function main() {
       description: "Building a marriage and home that endure.",
       category: "Family & Marriage",
       scriptureRef: "Matthew 7:24–27",
+      imageUrl: `${IMG}photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -442,6 +451,7 @@ async function main() {
       description: "Learning to rest in the sovereignty of God.",
       category: "Prayer",
       scriptureRef: "Psalm 46:10",
+      imageUrl: `${IMG}photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -450,6 +460,7 @@ async function main() {
       description: "Tracing God's faithfulness through Scripture.",
       category: "Scripture",
       scriptureRef: "Joshua 21:45",
+      imageUrl: `${IMG}photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -458,6 +469,7 @@ async function main() {
       description: "The heart of the Gospel, plainly told.",
       category: "Faith & Hope",
       scriptureRef: "Romans 5:20",
+      imageUrl: `${IMG}photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -466,6 +478,7 @@ async function main() {
       description: "Faithfulness over a lifetime, not just a moment.",
       category: "The Christian Life",
       scriptureRef: "Galatians 6:9",
+      imageUrl: `${IMG}photo-1473773508845-188df298d2d1?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -474,6 +487,7 @@ async function main() {
       description: "A teaching on prayer that is honest and unhurried.",
       category: "Prayer",
       scriptureRef: "Matthew 6:6–9",
+      imageUrl: `${IMG}photo-1545239351-ef35f43d514b?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -482,6 +496,7 @@ async function main() {
       description: "Love and respect in the Christian home.",
       category: "Family & Marriage",
       scriptureRef: "Romans 12:10",
+      imageUrl: `${IMG}photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -490,6 +505,7 @@ async function main() {
       description: "Why the Christian's hope is secure.",
       category: "Faith & Hope",
       scriptureRef: "Romans 5:3–5",
+      imageUrl: `${IMG}photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
   ];
@@ -497,7 +513,7 @@ async function main() {
   for (const sermon of sermons) {
     await prisma.sermon.upsert({
       where: { slug: sermon.slug },
-      update: {},
+      update: { imageUrl: sermon.imageUrl },
       create: { ...sermon, slug: sermon.slug },
     });
   }
@@ -614,9 +630,10 @@ async function main() {
       slug: "christmas-widows-outreach",
       title: "Christmas Widows Outreach Brings Hope to Over 1,500 Widows in Lagos",
       excerpt:
-        "More than 1,500 widows were welcomed for a day of care, dignity, and hope.",
+        "More than 1,500 widows were welcomed for a day of care, dignity, and hope through the Life Support Foundation.",
       category: "Outreach",
       date: "2025-12-20",
+      imageUrl: `${IMG}photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -624,17 +641,19 @@ async function main() {
       title: "Gospel Crusade Draws the Community Together in Faith",
       excerpt:
         "An evening of worship, preaching, and prayer that drew families from across the area.",
-      category: "Crusade",
+      category: "Crusades",
       date: "2025-10-15",
+      imageUrl: `${IMG}photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
       slug: "marriage-family-conference",
-      title: "Marriage & Family Conference Strengthens Homes in the Faith",
+      title: "Marriage & Family Conference Strengthens Homes",
       excerpt:
-        "Rev. Isaac and Rev. Mrs. Edith Mpamaugo shared decades of wisdom with couples and families.",
+        "Rev. Isaac and Rev. Mrs. Edith shared decades of wisdom with couples and families.",
       category: "Conferences",
       date: "2025-08-22",
+      imageUrl: `${IMG}photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
     {
@@ -644,6 +663,7 @@ async function main() {
         "Volunteers went into the community to pray with and encourage neighbors.",
       category: "Evangelism",
       date: "2025-06-10",
+      imageUrl: `${IMG}photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=600&q=80`,
       published: true,
     },
   ];
@@ -651,7 +671,7 @@ async function main() {
   for (const event of events) {
     await prisma.event.upsert({
       where: { slug: event.slug },
-      update: {},
+      update: { imageUrl: event.imageUrl, excerpt: event.excerpt, category: event.category, title: event.title },
       create: event,
     });
   }

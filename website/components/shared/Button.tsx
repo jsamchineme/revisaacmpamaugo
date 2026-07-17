@@ -50,7 +50,7 @@ export function GhostButtonLight({
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`inline-block py-[14px] px-[30px] rounded-full font-sans font-medium text-[.95rem] tracking-btn cursor-pointer border-none transition-[250ms] text-center hover:-translate-y-[2px] bg-transparent text-white border-[1.5px] border-white/50 hover:border-gold hover:text-gold ${className}`}
+      className={`inline-block py-[14px] px-[30px] rounded-full font-sans font-medium text-[.95rem] tracking-btn cursor-pointer transition-[250ms] text-center hover:-translate-y-[2px] bg-transparent text-white border-[1.5px] border-white/50 hover:border-gold hover:text-gold ${className}`}
       {...props}
     >
       {children}

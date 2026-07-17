@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type ReactNode } from "react";
 import { Button, GhostButtonLight } from "./Button";
 
@@ -38,7 +39,7 @@ export function HeroSection({
 
   return (
     <section
-      className="relative text-white text-center py-[140px_130px] overflow-hidden"
+      className="relative text-white text-center overflow-hidden"
       style={{ padding: "140px 0 130px" }}
     >
       {/* Background image + gradient overlay */}
@@ -59,12 +60,28 @@ export function HeroSection({
         </p>
 
         <div className="flex gap-[16px] justify-center flex-wrap">
-          {primaryButtonLabel && (primaryButtonHref || onPrimaryClick) && (
+          {primaryButtonLabel && primaryButtonHref && (
+            <Link
+              href={primaryButtonHref}
+              className="inline-block py-[14px] px-[30px] rounded-full bg-gold text-white font-sans font-medium text-[.95rem] tracking-btn cursor-pointer transition-[250ms] text-center hover:bg-gold-dark hover:-translate-y-[2px]"
+            >
+              {primaryButtonLabel}
+            </Link>
+          )}
+          {primaryButtonLabel && !primaryButtonHref && onPrimaryClick && (
             <Button variant="gold" onClick={onPrimaryClick}>
               {primaryButtonLabel}
             </Button>
           )}
-          {secondaryButtonLabel && (secondaryButtonHref || onSecondaryClick) && (
+          {secondaryButtonLabel && secondaryButtonHref && (
+            <Link
+              href={secondaryButtonHref}
+              className="inline-block py-[14px] px-[30px] rounded-full font-sans font-medium text-[.95rem] tracking-btn cursor-pointer transition-[250ms] text-center bg-transparent text-white border-[1.5px] border-white/50 hover:border-gold hover:text-gold"
+            >
+              {secondaryButtonLabel}
+            </Link>
+          )}
+          {secondaryButtonLabel && !secondaryButtonHref && onSecondaryClick && (
             <GhostButtonLight onClick={onSecondaryClick}>
               {secondaryButtonLabel}
             </GhostButtonLight>

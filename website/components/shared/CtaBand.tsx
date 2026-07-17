@@ -25,15 +25,15 @@ export function CtaBand({
 }: CtaBandProps) {
   return (
     <div
-      className={`bg-linear-to-br from-burgundy to-burgundy-dark text-white text-center rounded ${className}`}
-      style={{ background: "linear-gradient(135deg, var(--burgundy), var(--burgundy-dark))" }}
+      className={`text-white text-center rounded ${className}`}
+      style={{ background: "linear-gradient(135deg, #5a2231, #431824)" }}
     >
       <div className="py-[70px] px-[30px]">
         <h2 className="text-white text-section-h2 mb-[14px]">{headline}</h2>
         <p className="text-white/85 max-w-[560px] mx-auto mb-[30px]">{description}</p>
         {(buttonHref || onButtonClick) && (
           buttonHref ? (
-            <a href={buttonHref} className="inline-block py-[14px] px-[30px] rounded-full bg-gold text-ink font-sans font-medium text-[.95rem] tracking-[0.02em] transition-[250ms] hover:bg-gold-dark hover:-translate-y-[2px]">
+            <a href={buttonHref} className="inline-block py-[14px] px-[30px] rounded-full bg-gold text-white font-sans font-medium text-[.95rem] tracking-[0.02em] transition-[250ms] hover:bg-gold-dark hover:-translate-y-[2px]">
               {buttonLabel}
             </a>
           ) : (

@@ -60,35 +60,38 @@
   --max-width-faq: 780px;
 }
 
-/* ── Base ───────────────────────────────────────────── */
-html {
-  scroll-behavior: smooth;
-}
+/* ── Base — in @layer base so @layer utilities (Tailwind) can override ── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
-  font-family: var(--font-sans);
-  color: var(--color-ink);
-  background: var(--color-paper);
-  line-height: 1.7;
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-paper);
+    line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  line-height: 1.15;
-  color: var(--color-ink);
-}
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--color-ink);
+  }
 
-a { color: inherit; text-decoration: none; }
-img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+}
 
 /* ── Utilities ──────────────────────────────────────── */
 .wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
+  /* padding-inline only — keeps vertical padding utilities working on the same element */
+  padding-inline: 24px;
 }
 
 /* Section padding */
