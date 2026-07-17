@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  "team_mode": {
+    "enabled": true,
+    "max_parallel_members": 4,
+    "tmux_visualization": false
+  },
+
+  "experimental": { "aggressive_truncation": true, "task_system": true },
+
+  "agents": {
+    "sisyphus": {
+      "model": "opencode-go/kimi-k2.6",
+      "fallback_models": ["opencode-go/deepseek-v4-pro", "opencode-go/qwen3.6-plus"],
+      "description": "Orchestrator — reads PRD.md, decomposes into wave-structured tasks, spawns sub-agents up to capacity ceiling, monitors progress, re-queues failed tasks. Never writes code."
+    },
+    "oracle": {
+      "model": "opencode-go/glm-5.1",
+      "fallback_models": ["opencode-go/kimi-k2.6", "opencode-go/deepseek-v4-pro"],
+      "description": "Architecture agent — defines Prisma schema, REST API contract, and extracts design tokens from template HTML into tailwind.config.ts and tokens.css"
+    },
+    "prometheus": {
+      "model": "opencode-go/glm-5.1",
+      "fallback_models": ["opencode-go/kimi-k2.6"],
+      "description": "PRD decomposition — translates PRD.md into atomic wave-structured task list in TASKS.json, then hands off to sisyphus"
+    },
+    "multimodal-looker": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "fallback_models": ["opencode-go/kimi-k2.6", "opencode-go/qwen3.6-plus"],
+      "description": "UI engineer — studies template HTML + CSS in templates/ and implements pixel-accurate React components using Radix UI primitives and Tailwind tokens only. No hardcoded colours, spacing, or font sizes."
+    },
+    "momus": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "fallback_models": ["opencode-go/qwen3.6-plus", "opencode-go/kimi-k2.6"],
+      "description": "UI reviewer — audits every UI task output for visual accuracy against the template, token compliance (zero hardcoded values), Radix accessibility semantics, and component API consistency. Blocks task completion if violations exist."
+    },
+    "hephaestus": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "fallback_models": ["opencode-go/deepseek-v4-flash", "opencode-go/kimi-k2.6"],
+      "description": "Feature implementer — builds Next.js API routes, business logic, Prisma DB queries, auth (NextAuth + RBAC), and all CMS CRUD endpoints. Validates all input with Zod."
+    },
+    "sisyphus-junior": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Boilerplate and scaffolding — generates config files, shared TypeScript type files, test stubs, and repetitive structural code as directed by sisyphus. Does not make architectural decisions."
+    },
+    "librarian": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "fallback_models": ["opencode-go/qwen3.6-plus"],
+      "description": "Documentation agent — maintains docs/, adds JSDoc to public APIs, generates README updates. Runs in wave 7 after all features are complete."
+    },
+    "explore": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "description": "Codebase exploration — fast read-only agent for locating files, symbols, and patterns across the repo. Reports findings to sisyphus or the requesting agent. Never writes or edits files."
+    }
+  },
+
+  "categories": {
+    "visual-engineering": { "model": "opencode-go/deepseek-v4-pro", "fallback_models": "opencode-go/kimi-k2.6" },
+    "artistry": { "model": "opencode-go/deepseek-v4-pro", "fallback_models": "opencode-go/glm-5.1" },
+    "ultrabrain": { "model": "opencode-go/glm-5.1", "fallback_models": "opencode-go/kimi-k2.6" },
+    "quick": { "model": "opencode-go/deepseek-v4-flash" },
+    "writing": { "model": "opencode-go/deepseek-v4-flash", "fallback_models": "opencode-go/qwen3.6-plus" }
+  }
+}

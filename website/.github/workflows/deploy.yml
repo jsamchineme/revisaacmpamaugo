@@ -1,0 +1,123 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    # Allow manual trigger from GitHub Actions tab
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./website
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: ./website
+
+      - name: Build application
+        run: npm run build
+        working-directory: ./website
+        env:
+          NODE_ENV: production
+          DATABASE_URL: "file:./dev.db"
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+      - name: Prepare standalone output
+        run: |
+          # Standalone output is at .next/standalone/website/ (monorepo nesting)
+          STANDALONE=".next/standalone/website"
+          # Copy public assets
+          cp -r public "$STANDALONE/public"
+          # Copy static build output
+          mkdir -p "$STANDALONE/.next"
+          cp -r .next/static "$STANDALONE/.next/static"
+          # Copy Prisma client
+          mkdir -p "$STANDALONE/node_modules"
+          cp -r node_modules/.prisma "$STANDALONE/node_modules/"
+          cp -r node_modules/@prisma "$STANDALONE/node_modules/"
+          # Copy prisma schema
+          cp -r prisma "$STANDALONE/"
+          # Copy .env.example as reference
+          cp .env.example "$STANDALONE/.env.example"
+        working-directory: ./website
+
+      - name: Deploy via rsync to DigitalOcean Droplet
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: -avzr --delete --exclude='.env*' --exclude='logs/' --exclude='node_modules/'
+          path: website/.next/standalone/website/
+          remote_path: ${{ secrets.DO_DEPLOY_PATH }}
+          remote_host: ${{ secrets.DO_HOST }}
+          remote_user: ${{ secrets.DO_USER }}
+          remote_key: ${{ secrets.DO_SSH_KEY }}
+
+      - name: Restart application on DigitalOcean
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            DEPLOY_DIR="${{ secrets.DO_DEPLOY_PATH }}"
+
+            # Ensure .env.production exists
+            if [ ! -f "$DEPLOY_DIR/.env.production" ]; then
+              echo "WARNING: .env.production not found. Copy from .env.example and configure."
+            fi
+
+            # Change to deployment directory
+            cd "$DEPLOY_DIR"
+
+            # Copy ecosystem.config.js from project root
+            cp /var/www/revisaacmpamaugo/ecosystem.config.js ./ 2>/dev/null || true
+
+            # Run database migrations
+            if [ -f prisma/schema.prisma ]; then
+              npx prisma migrate deploy
+            fi
+
+            # Restart the application
+            pm2 startOrReload ecosystem.config.js --env production
+
+            # Save PM2 process list
+            pm2 save
+
+            # Reload Nginx
+            sudo nginx -t && sudo systemctl reload nginx
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            # Check if the app is running
+            sleep 5
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://revisaacmpamaugo.online/ || echo "000")
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "302" ]; then
+              echo "Deployment verification: SUCCESS (HTTP $STATUS)"
+            else
+              echo "Deployment verification: FAILED (HTTP $STATUS)"
+              exit 1
+            fi

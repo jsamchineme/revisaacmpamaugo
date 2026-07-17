@@ -1,0 +1,37 @@
+/**
+ * CSS Custom Properties — Design Tokens
+ * Extracted pixel-accurate from templates/revisaacmpamaugo-reverent-timeless.html
+ *
+ * Mirrors the Tailwind @theme definitions in app/globals.css.
+ * Use CSS variables directly when working outside of Tailwind utility classes.
+ */
+:root {
+  /* ── Colors ──────────────────────────────────── */
+  --ink: #1c1a17;
+  --paper: #faf7f2;
+  --cream: #f3ede2;
+  --line: #e3d9c8;
+  --gold: #b08642;
+  --gold-dark: #8c6a32;
+  --burgundy: #5a2231;
+  --burgundy-dark: #431824;
+  --muted: #6b635a;
+  --white: #fff;
+
+  /* ── Typography ───────────────────────────────── */
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Inter", system-ui, sans-serif;
+
+  /* ── Shadows ──────────────────────────────────── */
+  --shadow: 0 18px 50px rgba(40, 30, 20, 0.12);
+
+  /* ── Border Radius ────────────────────────────── */
+  --radius: 14px;
+
+  /* ── Spacing ──────────────────────────────────── */
+  --section-padding-y: 96px;
+  --section-padding-y-mobile: 64px;
+  --header-height: 74px;
+  --wrap-max-width: 1180px;
+  --wrap-padding-x: 24px;
+}

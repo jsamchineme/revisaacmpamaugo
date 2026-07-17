@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ============================================================
+   Design Tokens — extracted from
+   templates/revisaacmpamaugo-reverent-timeless.html
+   ============================================================ */
+
+@theme inline {
+  /* ── Colors ─────────────────────────────────────── */
+  --color-ink: #1c1a17;
+  --color-paper: #faf7f2;
+  --color-cream: #f3ede2;
+  --color-line: #e3d9c8;
+  --color-gold: #b08642;
+  --color-gold-dark: #8c6a32;
+  --color-burgundy: #5a2231;
+  --color-burgundy-dark: #431824;
+  --color-muted: #6b635a;
+  --color-white: #ffffff;
+
+  /* ── Typography ──────────────────────────────────── */
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* ── Font Sizes ──────────────────────────────────── */
+  --text-eyebrow: 0.78rem;
+  --text-tag: 0.72rem;
+  --text-lead: 1.15rem;
+  --text-card-title: 1.4rem;
+  --text-section-h2: clamp(2rem, 4vw, 2.8rem);
+  --text-page-h1: clamp(2.4rem, 5vw, 3.6rem);
+  --text-hero-h1: clamp(2.6rem, 6vw, 4.4rem);
+  --text-quote: 1.18rem;
+  --text-faq-q: 1.25rem;
+
+  /* ── Letter Spacing ──────────────────────────────── */
+  --tracking-eyebrow: 0.22em;
+  --tracking-tag: 0.12em;
+  --tracking-wide-sm: 0.06em;
+  --tracking-btn: 0.02em;
+
+  /* ── Border Radius ───────────────────────────────── */
+  --radius-DEFAULT: 14px;
+  --radius-full: 50px;
+  --radius-input: 10px;
+  --radius: 14px;
+
+  /* ── Shadows ─────────────────────────────────────── */
+  --shadow-card: 0 18px 50px rgba(40, 30, 20, 0.12);
+  --shadow-menu: 0 18px 50px rgba(40, 30, 20, 0.12);
+
+  /* ── Custom values used by components ────────────── */
+  --spacing-header-height: 74px;
+  --spacing-section: 6rem;
+  --spacing-section-mobile: 4rem;
+  --spacing-section-head-bottom: 56px;
+  --max-width-wrap: 1180px;
+  --max-width-section-head: 680px;
+  --max-width-faq: 780px;
+}
+
+/* ── Base ───────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  line-height: 1.7;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ── Utilities ──────────────────────────────────────── */
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Section padding */
+.section-padding {
+  padding: 96px 0;
+}
+@media (max-width: 900px) {
+  .section-padding { padding: 64px 0; }
+}
+
+/* Animation */
+@keyframes fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-fade { animation: fade .4s ease; }
+
+/* ── Scrollbar (admin) ──────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <rect width="800" height="500" fill="#FAF7F2"/>
+  <rect x="300" y="160" width="200" height="160" rx="12" fill="#D4AF37" opacity="0.2"/>
+  <rect x="320" y="180" width="160" height="30" rx="6" fill="#8B6914" opacity="0.3"/>
+  <rect x="340" y="230" width="120" height="8" rx="4" fill="#8B6914" opacity="0.4"/>
+  <rect x="340" y="250" width="80" height="8" rx="4" fill="#8B6914" opacity="0.4"/>
+  <rect x="340" y="270" width="100" height="8" rx="4" fill="#8B6914" opacity="0.4"/>
+  <circle cx="400" cy="130" r="25" fill="#D4AF37" opacity="0.3"/>
+  <path d="M400 115 L400 145 M385 130 L415 130" stroke="#8B6914" stroke-width="2.5" opacity="0.5" stroke-linecap="round"/>
+  <text x="400" y="350" font-family="Georgia, serif" font-size="18" fill="#5C4033" text-anchor="middle" opacity="0.6">Event</text>
+</svg>

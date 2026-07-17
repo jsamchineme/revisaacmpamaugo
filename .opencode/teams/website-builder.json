@@ -1,0 +1,49 @@
+{
+  "name": "website-builder",
+  "description": "Build the Rev. Isaac Mpamaugo website with CMS in 7 parallel waves",
+  "lead": { "kind": "subagent_type", "subagent_type": "sisyphus" },
+  "members": [
+    {
+      "kind": "category",
+      "name": "wave-1-foundation",
+      "category": "quick",
+      "prompt": "Wave 1: Foundation & Architecture. Initialize Next.js 15 with TypeScript + Tailwind v4 + App Router. Install all deps (Prisma, NextAuth, TipTap, @dnd-kit, react-hook-form, zod, @radix-ui/*, sharp). Create Prisma schema matching PRD section 4 models with SQLite. Write full seed script. Configure NextAuth with credentials provider and JWT. Add auth middleware for /admin/*. Create project folder structure: /app (public routes), /app/admin (admin routes), /app/api (API routes), /components (shared + admin), /lib (db, auth, utils), /types (TypeScript types)."
+    },
+    {
+      "kind": "category",
+      "name": "wave-2-design",
+      "category": "visual-engineering",
+      "prompt": "Wave 2: Design System & Components. Read templates/revisaacmpamaugo-reverent-timeless.html fully. Extract every color, font, spacing, shadow, and radius into tailwind.config.ts and src/styles/tokens.css per PRD section 6. Build all 19 shared components: Header, Footer, Button (3 variants), Card, SectionHead, Eyebrow, Tag, FilterPill, StepNumber, Quote, FAQItem, HeroSection, TrustBar, CtaBand, FeatureBlock, SplitBlock, InfoRow, SocialLinks, Modal, PageHero. Build main layout with Header + Footer. Build a section renderer that takes section type + content and renders the matching component. All components must use Tailwind tokens only — zero hardcoded values. Must be pixel-accurate to the template."
+    },
+    {
+      "kind": "category",
+      "name": "wave-3-public-pages",
+      "category": "visual-engineering",
+      "prompt": "Wave 3: Public Pages. Build dynamic page renderer that fetches Page by slug and renders its sections array. Build all section-type components from PRD section 4 (hero, trustStrip, featuresGrid, aboutPreview, sermonsPreview, eventsPreview, testimonials, ctaBand, textContent, faq, steps, contactForm, contactInfo, grid, splitContent, pageHero, missionVision, imageBlock, contactForm). Build Sermons list page with URL-based category filter. Build single Sermon page /sermons/[slug]. Build Teachings list page with filter. Build single Teaching page /teachings/[slug]. Build Events list page with filter. Build single Event page /events/[slug]. Build Contact form POST API handler that saves to DB. Add SEO metadata per page via generateMetadata. Generate sitemap.xml route. Use ISR (revalidate: 60) for all pages."
+    },
+    {
+      "kind": "category",
+      "name": "wave-4-admin-shell",
+      "category": "ultrabrain",
+      "prompt": "Wave 4: Admin Shell & Auth. Build admin layout with fixed left sidebar (nav: Dashboard, Pages, Sermons, Teachings, Events, Testimonials, Messages, Media, Users, Settings) + top bar with breadcrumb and logout. Build login page at /admin/login with NextAuth credentials form. Build dashboard at /admin with stats (total sermons, teachings, events, unread messages). Build Users CRUD at /admin/users (table, create/edit form with role select). Build Settings page at /admin/settings (site title, tagline, social links, contact info fields). Auth middleware must check JWT session and role for /admin/* routes, redirect to /admin/login if unauthenticated."
+    },
+    {
+      "kind": "category",
+      "name": "wave-5-page-editor",
+      "category": "ultrabrain",
+      "prompt": "Wave 5: Section-Based Page Editor. Build /admin/pages list page with table of all pages and 'Edit' link. Build /admin/pages/[id]/edit page showing ordered section list with drag-and-drop reorder via @dnd-kit. Build 'Add Section' button that opens a type picker dropdown with all section types from PRD. Build slide-over edit panel for each section type with type-specific form fields: text inputs, TipTap rich text editor for body fields, image selector that opens media library picker, color inputs, repeater lists for features/stats/FAQ. Build TipTap editor component with toolbar: bold, italic, heading (h2-h4), blockquote, bullet/ordered lists, link, image. Build save/publish flow that serializes sections as JSON and updates Page record via API."
+    },
+    {
+      "kind": "category",
+      "name": "wave-6-content-managers",
+      "category": "hephaestus",
+      "prompt": "Wave 6: Content Managers. Build Sermons CRUD (list table with search/filter, create form with TipTap body + category select + scripture ref + image upload + audioUrl/videoUrl, edit, delete with confirmation). Build Teachings CRUD (same pattern). Build Events CRUD (add date picker, category select for Outreach/Evangelism/Conferences/Crusades). Build Testimonials CRUD (simple form: quote textarea, author, role, order number). Build Contact Messages inbox (table with read/unread status, click to open full message, mark read button, delete). Build Media Library (upload grid with drag-drop zone, thumbnail preview for images, filename + size display, delete with confirmation, copy URL button). All CRUD backed by API routes with Zod validation."
+    },
+    {
+      "kind": "category",
+      "name": "wave-7-deployment",
+      "category": "writing",
+      "prompt": "Wave 7: Deployment & Polish. Read PRD.md sections 3 (architecture) and 10. Configure Next.js for standalone output (output: 'standalone' in next.config.ts). Create PM2 ecosystem.config.js with env vars and start script. Create Nginx config template with reverse proxy to localhost:3000, SSL certbot integration, security headers, static file serving for /uploads and /_next/static. Create GitHub Actions CI/CD workflow (.github/workflows/deploy.yml) that builds on push to main and deploys via rsync to VPS. Create .env.example with all required variables documented. Add robots.txt. Run the seed script. Do a final verification: all routes load, CRUD operations work on all content types, responsive design matches template at all breakpoints, admin auth works."
+    }
+  ]
+}
