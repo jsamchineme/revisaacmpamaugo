@@ -24,8 +24,14 @@ export const authConfig: NextAuthConfig = {
     },
     async authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
+      const userRole = auth?.user?.role as "ADMIN" | "EDITOR" | "AUTHOR" | undefined;
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
       const isLoginPage = nextUrl.pathname === "/admin/login";
+
+      const adminOnlyRoutes = ["/admin/users"];
+      const isAdminOnlyRoute = adminOnlyRoutes.some((route) =>
+        nextUrl.pathname.startsWith(route)
+      );
 
       if (isLoginPage) {
         // Redirect to dashboard if already logged in
@@ -39,6 +45,11 @@ export const authConfig: NextAuthConfig = {
           loginUrl.searchParams.set("callbackUrl", nextUrl.pathname);
           return Response.redirect(loginUrl);
         }
+
+        if (isAdminOnlyRoute && userRole !== "ADMIN") {
+          return Response.redirect(new URL("/admin", nextUrl));
+        }
+
         return true;
       }
 

@@ -1,5 +1,14 @@
 import { SectionRenderer } from "@/components/shared";
 import { prisma } from "@/lib/db";
+import type { Metadata } from "next";
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Rev. Isaac Mpamaugo | Sermons, Teachings & Ministry",
+  description:
+    "A retired Reverend sharing a lifetime of sermons and Bible teaching. Listen, be encouraged, or get in touch.",
+};
 
 const defaultSections = [
   {
@@ -226,7 +235,7 @@ export default async function Home() {
   // defaults fill in missing images/icons/content
   const homeSections = mergeSections(dbSections, defaultSections);
 
-  const [sermons, events] = await Promise.all([
+  const [sermons, events, testimonials] = await Promise.all([
     prisma.sermon.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
@@ -253,12 +262,17 @@ export default async function Home() {
         imageUrl: true,
       },
     }),
+    prisma.testimonial.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" },
+      select: { quote: true, author: true, role: true },
+    }),
   ]);
 
   return (
     <SectionRenderer
       sections={homeSections}
-      context={{ sermons, events }}
+      context={{ sermons, events, testimonials }}
     />
   );
 }

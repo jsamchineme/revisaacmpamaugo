@@ -134,7 +134,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
             );
 
           // ── Sermons Preview ────────────────────────
-          case "sermonsPreview":
+          case "sermonsPreview": {
             const previewCount = content.count ?? 3;
             const sermons = (context?.sermons ?? []).slice(0, previewCount);
             return (
@@ -150,7 +150,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                       {sermons.map((s) => (
                         <Card
                           key={s.slug}
-                          imageUrl={s.imageUrl ?? "/images/sermon-placeholder.svg"}
+                          imageUrl={s.imageUrl ?? "/placeholder-sermon.jpg"}
                           imageAlt={s.title}
                           tag={s.category ?? undefined}
                           title={s.title}
@@ -174,9 +174,10 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                 </div>
               </section>
             );
+          }
 
           // ── Events Preview ─────────────────────────
-          case "eventsPreview":
+          case "eventsPreview": {
             const eventPreviewCount = content.count ?? 3;
             const events = (context?.events ?? []).slice(0, eventPreviewCount);
             return (
@@ -192,7 +193,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                       {events.map((e) => (
                         <Card
                           key={e.slug}
-                          imageUrl={e.imageUrl ?? "/images/event-placeholder.svg"}
+                          imageUrl={e.imageUrl ?? "/placeholder-event.jpg"}
                           imageAlt={e.title}
                           tag={e.category ? `${e.category} · ${e.date ?? ""}` : (e.date ?? undefined)}
                           title={e.title}
@@ -216,6 +217,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
                 </div>
               </section>
             );
+          }
 
           // ── Testimonials ───────────────────────────
           case "testimonials":
