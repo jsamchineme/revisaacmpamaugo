@@ -129,54 +129,22 @@ export default function EventPageClient({
     </div>
   ) : null;
 
-  // If there's custom HTML design content, render it
+  // If there's a custom HTML design, serve it via iframe so scripts execute
+  // and the RSVP form is injected server-side by the render route
   if (event.designContent) {
-    let html = event.designContent;
-    html = html.replace(/\{\{eventTitle\}\}/g, event.title);
-    html = html.replace(/\{\{eventDate\}\}/g, event.formattedDate);
-    html = html.replace(/\{\{eventTime\}\}/g, event.formattedTime);
-    html = html.replace(/\{\{venue\}\}/g, "");
-
-    const hasRsvpPlaceholder = html.includes("{{rsvpForm}}");
-
-    if (hasRsvpPlaceholder) {
-      const parts = html.split("{{rsvpForm}}");
-      return (
-        <article className="min-h-screen bg-paper">
-          <div dangerouslySetInnerHTML={{ __html: parts[0] }} />
-          <section className="py-12 md:py-16 bg-paper">
-            <div className="mx-auto px-4" style={{ maxWidth: 760 }}>
-              {statusBar}
-              {closedMessage}
-              {spotsMessage}
-              {rsvpFormElement}
-            </div>
-          </section>
-          {parts[1] && <div dangerouslySetInnerHTML={{ __html: parts[1] }} />}
-        </article>
-      );
-    }
-
     return (
-      <article className="min-h-screen bg-paper">
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-        <section className="py-12 md:py-16 border-t border-line bg-paper">
-          <div className="mx-auto px-4" style={{ maxWidth: 760 }}>
-            {statusBar}
-            {closedMessage}
-            {spotsMessage}
-            {rsvpFormElement}
-            <div className="mt-12 pt-8 border-t border-line">
-              <a
-                href="/"
-                className="inline-block font-semibold text-[.9rem] text-burgundy hover:text-gold-dark transition-colors"
-              >
-                ← Back to home
-              </a>
-            </div>
-          </div>
-        </section>
-      </article>
+      <iframe
+        src={`/api/events/${event.slug}/render`}
+        title={event.title}
+        style={{
+          display: "block",
+          position: "fixed",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          border: "none",
+        }}
+      />
     );
   }
 

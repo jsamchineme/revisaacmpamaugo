@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Rev. Isaac Mpamaugo | Sermons, Teachings & Ministry",
+  title: "Rev. Isaac & Rev. Mrs. Edith Mpamaugo | Sermons, Teachings & Ministries",
   description:
-    "A retired Reverend sharing a lifetime of sermons and Bible teaching. Listen, be encouraged, or get in touch.",
+    "Rev. Isaac and Rev. Mrs. Edith Mpamaugo — a lifetime of Gospel ministry, sermons, Bible teaching, missions, and community outreach. Listen, be encouraged, or get in touch.",
 };
 
 const defaultSections = [
@@ -18,7 +18,7 @@ const defaultSections = [
     content: {
       headline: "Faithful Service.<br/>Timeless Truth.",
       subheadline:
-        "For over 50 years, Rev. Isaac Mpamaugo has preached the Gospel and shepherded God's people. Today he and his wife Rev. Mrs. Edith Mpamaugo share a lifetime of sermons and teaching with all who are seeking.",
+        "For over 50 years, Rev. Isaac Mpamaugo and his co-ministry partner Rev. Mrs. Edith Mpamaugo have preached the Gospel, served the church, and loved God's people together. This is their lifetime of sermons, teaching, and ministry — shared with all who are seeking.",
       backgroundImage: "/images/hero-couple.png",
       buttons: [
         { label: "Listen to a Sermon", href: "/sermons" },
@@ -35,7 +35,7 @@ const defaultSections = [
         { number: "50+", label: "Years in Ministry" },
         { number: "200", label: "Congregations Served" },
         { number: "Hundreds", label: "Sermons & Teachings" },
-        { number: "50", label: "Years of Shared Ministry" },
+        { number: "1,500+", label: "Widows Served Annually" },
       ],
     },
   },
@@ -64,7 +64,7 @@ const defaultSections = [
           icon: "🤝",
           title: "A Shared Calling",
           description:
-            "The fruit of a lifetime of ministry by Rev. Isaac and his wife Rev. Mrs. Edith Mpamaugo, side by side.",
+            "Rev. Isaac and his co-ministry partner Rev. Mrs. Edith Mpamaugo have walked this road together for over 50 years — preaching, teaching, and serving side by side.",
         },
       ],
     },
@@ -76,9 +76,9 @@ const defaultSections = [
     content: {
       eyebrow: "Our Story",
       headline: "A Life Given to the Gospel",
-      body: "Rev. Isaac Mpamaugo answered the call to ministry as a young man and has spent his life pointing people to Christ. Alongside his wife Rev. Mrs. Edith Mpamaugo, he has pastored, taught, counseled, and prayed with countless families.",
+      body: "Rev. Isaac Mpamaugo answered the call to ministry as a young man and has spent his life pointing people to Christ. Beside him every step of the way has been his co-ministry partner Rev. Mrs. Edith Mpamaugo — together they have pastored, taught, counselled, led missions, and prayed with countless families across Nigeria and beyond.",
       extraParagraphs: [
-        "Though now retired from the pulpit, his calling has never stopped — it simply found a new way to reach you.",
+        "Rev. Isaac and Rev. Mrs. Edith remain active in ministry — preaching, teaching, and serving. This site brings their message to you wherever you are.",
       ],
       imageUrl: "/images/about-portrait.png",
       imageAlt: "Portrait of a dignified older minister",
@@ -138,7 +138,7 @@ const defaultSections = [
     content: {
       headline: "However far the road, grace reaches further.",
       description:
-        "Reach out for prayer, an encouraging word, or to invite Rev. Isaac to minister.",
+        "Reach out for prayer, an encouraging word, or to invite Rev. Isaac or Rev. Mrs. Edith to minister.",
       buttonLabel: "Get in Touch",
       buttonLink: "/contact",
     },

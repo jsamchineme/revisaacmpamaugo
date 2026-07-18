@@ -275,7 +275,7 @@ export function SectionRenderer({ sections, context }: SectionRendererProps) {
           // ── FAQ ────────────────────────────────────
           case "faq":
             return (
-              <section key={key} className="section-padding bg-cream">
+              <section key={key} className={`section-padding ${content.background === "white" ? "" : "bg-cream"}`}>
                 <div className="wrap">
                   <SectionHead
                     eyebrow={content.eyebrow}

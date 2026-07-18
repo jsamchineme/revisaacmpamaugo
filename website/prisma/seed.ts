@@ -250,6 +250,218 @@ async function main() {
       ]),
     },
     {
+      slug: "ministries",
+      title: "Ministries",
+      metaDescription:
+        "Ministries | Rev. Isaac & Rev. Mrs. Edith Mpamaugo — How they serve through preaching, women's ministry, the Life Support Foundation, missions, and more.",
+      sections: JSON.stringify([
+        {
+          id: "pagehero-ministries",
+          type: "pageHero",
+          order: 1,
+          content: {
+            eyebrow: "Ministries",
+            headline: "How Rev. Isaac & Rev. Mrs. Edith Serve",
+            subtitle:
+              "A lifetime of ministry takes many forms. Here are the ways Rev. Isaac and his co-ministry partner Rev. Mrs. Edith Mpamaugo continue to serve the church, the community, and individual believers today.",
+          },
+        },
+        {
+          id: "grid-his-ministry",
+          type: "grid",
+          order: 2,
+          content: {
+            eyebrow: "Rev. Isaac Mpamaugo",
+            title: "His Ministry",
+            items: [
+              { icon: "🎙️", title: "Preaching", description: "Gospel-centered messages for Sundays, conferences, conventions, and special gatherings — Rev. Isaac's hallmark for over five decades." },
+              { icon: "📖", title: "Bible Teaching", description: "Verse-by-verse and topical teaching that makes Scripture clear and applicable to everyday life." },
+              { icon: "🌱", title: "Mentoring Ministers", description: "Rev. Isaac invests in younger pastors and church leaders, sharing hard-won wisdom from a lifetime of pastoral ministry." },
+            ],
+          },
+        },
+        {
+          id: "grid-her-ministry",
+          type: "grid",
+          order: 3,
+          content: {
+            eyebrow: "Rev. Mrs. Edith Mpamaugo",
+            title: "Her Ministry",
+            items: [
+              { icon: "❤️", title: "Life Support Foundation", description: "Co-founder and convener of the Life Support Foundation — since 1996 providing medical outreach, food, and empowerment to over 1,500 vulnerable widows in Lagos each year." },
+              { icon: "👩‍👧", title: "Ministry to Women & Families", description: "Rev. Mrs. Edith brings decades of wisdom to women's ministry, family life, and pastoral care — a gifted minister in her own right." },
+              { icon: "🙏", title: "Prayer & Pastoral Care", description: "A faithful intercessor and counsellor — Rev. Mrs. Edith carries the burdens of God's people with compassion and faith." },
+            ],
+          },
+        },
+        {
+          id: "grid-shared-ministry",
+          type: "grid",
+          order: 4,
+          content: {
+            eyebrow: "Together",
+            title: "Their Shared Ministry",
+            items: [
+              { icon: "💍", title: "Marriage & Family", description: "Wisdom from over 50 years of marriage and ministry — Rev. Isaac and Rev. Mrs. Edith minister together to couples and families." },
+              { icon: "✈️", title: "Missions", description: "A heart for the nations: Rev. Isaac and Rev. Mrs. Edith have carried the Gospel across Nigeria, Africa, and beyond." },
+              { icon: "⚓", title: "A Lifetime of Faithfulness", description: "Fifty years of standing together — in the pulpit, in the home, in the community. Two callings, one purpose." },
+            ],
+          },
+        },
+        {
+          id: "steps-ministries",
+          type: "steps",
+          order: 5,
+          content: {
+            eyebrow: "Invite Them",
+            title: "How to Invite Rev. Isaac or Rev. Mrs. Edith",
+            steps: [
+              { title: "Reach Out", description: "Send a message through the Contact page with your event, occasion, or need." },
+              { title: "We Talk It Through", description: "Dates, theme, audience, and how Rev. Isaac or Rev. Mrs. Edith can best serve your gathering." },
+              { title: "They Minister", description: "In person where possible, or by recorded message where not." },
+            ],
+          },
+        },
+        {
+          id: "faq-ministries",
+          type: "faq",
+          order: 6,
+          content: {
+            background: "white",
+            eyebrow: "Questions",
+            title: "Frequently Asked",
+            items: [
+              { question: "Are Rev. Isaac or Rev. Mrs. Edith available to preach or speak at events?", answer: "Yes, as their schedule allows. Use the Contact page to share the date, location, and occasion, and we'll respond." },
+              { question: "Can I request prayer?", answer: "Absolutely. Send your request through the Contact form. Every request is read and prayed over." },
+              { question: "Are the sermons free to share?", answer: "Yes. You're welcome to share them with anyone who would be encouraged by them." },
+              { question: "Does Rev. Isaac offer counselling or pastoral advice?", answer: "Rev. Isaac offers prayer and spiritual encouragement. For ongoing pastoral or professional counselling, he's glad to point you to trusted resources." },
+              { question: "How can I support the ministry?", answer: "Your prayers and your sharing of these messages are a real encouragement. To give financially, visit the Give page. To partner with the widows' outreach of the Life Support Foundation, mention it in your message." },
+            ],
+            bottomCtaLabel: "Have something on your heart?",
+            bottomCtaLink: "/contact",
+          },
+        },
+      ]),
+    },
+    {
+      slug: "missions",
+      title: "Missions",
+      metaDescription:
+        "Missions | Rev. Isaac & Rev. Mrs. Edith Mpamaugo — Carrying the Gospel across Nigeria, Africa, and beyond. Partner through prayer, giving, and invitation.",
+      sections: JSON.stringify([
+        {
+          id: "pagehero-missions",
+          type: "pageHero",
+          order: 1,
+          content: {
+            eyebrow: "Missions",
+            headline: "Taking the Gospel to the Nations",
+            subtitle: "Rev. Isaac and Rev. Mrs. Edith Mpamaugo have carried the Gospel beyond the walls of any single church — across Nigeria, the African continent, and beyond. Missions is not a programme; it is a conviction.",
+          },
+        },
+        {
+          id: "grid-missions-areas",
+          type: "grid",
+          order: 2,
+          content: {
+            eyebrow: "Areas of Outreach",
+            title: "Where They Have Served",
+            items: [
+              { icon: "🇳🇬", title: "Nigeria", description: "Evangelistic crusades, church conferences, and pastoral visits across Lagos, the South-East, and beyond." },
+              { icon: "🌍", title: "Africa", description: "Rev. Isaac has preached at international conventions and ministry gatherings across West and East Africa." },
+              { icon: "✈️", title: "Beyond Africa", description: "Both Rev. Isaac and Rev. Mrs. Edith have ministered in the diaspora — speaking into the lives of Nigerian communities abroad and international congregations." },
+              { icon: "🏥", title: "Medical Outreach", description: "The Life Support Foundation's annual widows' outreach brings free medical care, food parcels, and empowerment to over 1,500 widows in Lagos each year." },
+              { icon: "👩‍👧", title: "Women & Families", description: "Rev. Mrs. Edith's ministry to women crosses borders and generations — discipling, counselling, and equipping wives, mothers, and daughters." },
+              { icon: "🌱", title: "Church Planting & Mentoring", description: "Rev. Isaac has mentored pastors and church leaders across Nigeria, pouring hard-won wisdom into the next generation of ministers." },
+            ],
+          },
+        },
+        {
+          id: "grid-missions-partner",
+          type: "grid",
+          order: 3,
+          content: {
+            eyebrow: "Partner With Us",
+            title: "Join the Missionary Work",
+            items: [
+              { icon: "🙏", title: "Pray", description: "The most important thing. Ask for open doors, travelling mercies, and fruitful ministry every time they go." },
+              { icon: "💰", title: "Give", description: "Financial partnership sustains the outreach, the widows' programme, and the costs of travel and ministry. Visit the Give page to partner." },
+              { icon: "📣", title: "Share", description: "Spread the sermons, teachings, and testimonies of what God has done — every share is a small act of mission." },
+              { icon: "✉️", title: "Invite", description: "Hosting Rev. Isaac or Rev. Mrs. Edith for a crusade, conference, or convention? Reach out via the Contact page." },
+            ],
+          },
+        },
+        {
+          id: "cta-missions",
+          type: "ctaBand",
+          order: 4,
+          content: {
+            headline: "Ready to partner with the mission?",
+            description: "Pray, give, share, or invite — every act of partnership counts.",
+            buttonLabel: "Get in Touch",
+            buttonLink: "/contact",
+          },
+        },
+      ]),
+    },
+    {
+      slug: "give",
+      title: "Give",
+      metaDescription:
+        "Give | Rev. Isaac & Rev. Mrs. Edith Mpamaugo — Partner with the ministry through prayer, financial giving, or volunteering.",
+      sections: JSON.stringify([
+        {
+          id: "pagehero-give",
+          type: "pageHero",
+          order: 1,
+          content: {
+            eyebrow: "Give",
+            headline: "Partner With This Ministry",
+            subtitle: "Every gift — however large or small — sustains the preaching of the Gospel, the widows' outreach, and the teaching ministry of Rev. Isaac and Rev. Mrs. Edith Mpamaugo. Thank you for your generosity.",
+          },
+        },
+        {
+          id: "grid-give-impact",
+          type: "grid",
+          order: 2,
+          content: {
+            eyebrow: "Why Give?",
+            title: "Your Gift at Work",
+            items: [
+              { icon: "📖", title: "Sermons & Teachings", description: "Keeping this archive free and accessible to everyone — anywhere in the world — so that no one is turned away from the Word of God because they cannot afford it." },
+              { icon: "❤️", title: "Widows' Outreach", description: "The Life Support Foundation — co-founded and led by Rev. Mrs. Edith Mpamaugo — reaches over 1,500 vulnerable widows in Lagos each year with free medical care, food, and financial empowerment." },
+              { icon: "✈️", title: "Missions & Evangelism", description: "Covering the costs of travel, logistics, and materials so that Rev. Isaac and Rev. Mrs. Edith can continue to take the Gospel to churches, crusades, and communities across Nigeria and beyond." },
+            ],
+          },
+        },
+        {
+          id: "grid-give-other",
+          type: "grid",
+          order: 3,
+          content: {
+            eyebrow: "Other Ways to Give",
+            title: "More Than Money",
+            items: [
+              { icon: "🙏", title: "Prayer Partnership", description: "Commit to praying regularly for the ministry, the missions, and the widows' outreach. This is the most powerful form of partnership we know." },
+              { icon: "📣", title: "Share the Messages", description: "Share a sermon or teaching with someone who needs it. Spread the word about the Life Support Foundation's work. Every share extends the reach." },
+              { icon: "🤝", title: "Volunteer", description: "Are you in Lagos and want to serve at the annual widows' outreach? Contact us — there is always a place for willing hands." },
+            ],
+          },
+        },
+        {
+          id: "cta-give",
+          type: "ctaBand",
+          order: 4,
+          content: {
+            headline: "Every gift is a seed sown in faith.",
+            description: "We are grateful for every partner who stands with this ministry. Get in touch to discuss how you can give.",
+            buttonLabel: "Contact Us to Give",
+            buttonLink: "/contact",
+          },
+        },
+      ]),
+    },
+    {
       slug: "ministry",
       title: "Ministry",
       metaDescription:

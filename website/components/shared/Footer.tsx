@@ -6,10 +6,12 @@ import { SocialLinks } from "./SocialLinks";
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Ministry", href: "/ministry" },
+  { label: "Ministries", href: "/ministries" },
+  { label: "Missions", href: "/missions" },
   { label: "Sermons", href: "/sermons" },
   { label: "Teachings", href: "/teachings" },
   { label: "Events", href: "/events" },
+  { label: "Give", href: "/give" },
 ];
 
 const SOCIALS = [
@@ -38,13 +40,13 @@ export function Footer() {
               <div className="font-serif font-semibold text-[1.2rem] leading-[1.1] text-white">
                 Rev. Isaac Mpamaugo
                 <small className="block font-sans text-[.62rem] tracking-[0.18em] uppercase text-gold-dark font-semibold">
-                  Ministry of the Word
+                  &amp; Rev. Mrs. Edith Mpamaugo
                 </small>
               </div>
             </div>
             <p className="text-[.92rem] mb-[8px] leading-relaxed">
-              A lifetime of faithful service, sermons, and teaching — shared by
-              Rev. Isaac and Rev. Mrs. Edith Mpamaugo.
+              A lifetime of faithful service, sermons, teaching, and outreach —
+              shared together by Rev. Isaac and Rev. Mrs. Edith Mpamaugo.
             </p>
             <SocialLinks links={SOCIALS} variant="footer" />
           </div>
@@ -89,7 +91,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-white/14 pt-[24px] text-center text-[.85rem] text-white/55">
-          &copy; {year} The Ministry of Rev. Isaac Mpamaugo. All rights reserved.
+          &copy; {year} The Ministry of Rev. Isaac &amp; Rev. Mrs. Edith Mpamaugo. All rights reserved.
         </div>
       </div>
     </footer>
