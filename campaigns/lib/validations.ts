@@ -45,6 +45,8 @@ export const eventSchema = z.object({
   description: z.string().optional().or(z.literal("")),
   capacity: z.string().optional().or(z.literal("")),
   imageUrl: z.string().optional().or(z.literal("")),
+  designContent: z.string().optional().or(z.literal("")),
+  formConfig: z.string().optional().or(z.literal("")),
 });
 
 export type EventFormData = z.infer<typeof eventSchema>;

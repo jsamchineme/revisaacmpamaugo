@@ -139,7 +139,25 @@ export default function EventsPage() {
                     {event.capacity ?? "Unlimited"}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
+                      <Link
+                        href={`/admin/events/${event.id}/design`}
+                        className="px-3 py-1 text-sm bg-burgundy text-white rounded hover:bg-burgundy-dark transition-colors"
+                      >
+                        Design
+                      </Link>
+                      <Link
+                        href={`/admin/events/${event.id}/form-builder`}
+                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
+                      >
+                        Form
+                      </Link>
+                      <Link
+                        href={`/admin/events/${event.id}/registrations`}
+                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
+                      >
+                        Registrations
+                      </Link>
                       <Link
                         href={`/admin/events/${event.id}/edit`}
                         className="px-3 py-1 text-sm bg-gold text-white rounded hover:bg-gold-dark transition-colors"

@@ -86,15 +86,17 @@ model SendLog {
 // ─── Events ──────────────────────────────────────────────────────────────────
 
 model Event {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  date        DateTime
-  description String?
-  capacity    Int?
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  date          DateTime
+  description   String?
+  capacity      Int?
+  imageUrl      String?
+  designContent String?  // JSON: AI-generated page sections (hero, details, etc.)
+  formConfig    String?  // JSON: RSVP form field configuration
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // ─── Registrations ───────────────────────────────────────────────────────────
@@ -109,6 +111,7 @@ model Registration {
   plusOne        Boolean  @default(false)
   plusOneGuests  String?
   whatsappOptIn  Boolean  @default(false)
+  customData     String?  // JSON: arbitrary form fields from dynamic RSVP form
   createdAt      DateTime @default(now())
 }
 

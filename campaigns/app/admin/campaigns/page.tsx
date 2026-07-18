@@ -140,22 +140,10 @@ export default function CampaignsPage() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2 flex-wrap">
                       <Link
-                        href={`/admin/campaigns/${campaign.id}/send`}
+                        href={`/admin/campaigns/${campaign.id}`}
                         className="px-3 py-1 text-sm bg-burgundy text-white rounded hover:bg-burgundy-dark transition-colors"
                       >
-                        Send
-                      </Link>
-                      <Link
-                        href={`/admin/campaigns/${campaign.id}/contacts`}
-                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
-                      >
-                        Contacts
-                      </Link>
-                      <Link
-                        href={`/admin/campaigns/${campaign.id}/analytics`}
-                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
-                      >
-                        Analytics
+                        View
                       </Link>
                       <Link
                         href={`/admin/campaigns/${campaign.id}/edit`}

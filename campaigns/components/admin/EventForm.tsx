@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventSchema, EventFormData } from "@/lib/validations";
+import ImageUpload from "@/components/ImageUpload";
 
 interface EventFormProps {
   initialData?: Partial<EventFormData>;
@@ -27,6 +28,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
     handleSubmit,
     setValue,
     getValues,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -136,12 +138,10 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium">Image URL</label>
-          <input
-            type="text"
-            {...register("imageUrl")}
-            placeholder="https://..."
-            className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+          <ImageUpload
+            value={watch("imageUrl") || ""}
+            onChange={(url) => setValue("imageUrl", url, { shouldValidate: true })}
+            label="Event Image"
           />
           {errors.imageUrl && (
             <p className="text-sm text-red-500">{errors.imageUrl.message}</p>

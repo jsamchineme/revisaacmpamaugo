@@ -51,7 +51,7 @@ export async function PUT(
       );
     }
 
-    const { title, slug, date, description, capacity, imageUrl } = parsed.data;
+    const { title, slug, date, description, capacity, imageUrl, designContent, formConfig } = parsed.data;
 
     const existing = await prisma.event.findUnique({ where: { id } });
     if (!existing) {
@@ -79,6 +79,8 @@ export async function PUT(
         description: description || null,
         capacity: capacityNum,
         imageUrl: imageUrl || null,
+        designContent: designContent || null,
+        formConfig: formConfig || null,
       },
     });
 

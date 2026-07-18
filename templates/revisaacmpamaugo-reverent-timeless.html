@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rev. Isaac Mpamaugo | Sermons, Teachings & Ministry</title>
-<meta name="description" content="A retired Reverend sharing a lifetime of sermons and Bible teaching. Listen, be encouraged, or get in touch.">
+<title>Rev. Isaac & Rev. Mrs. Edith Mpamaugo | Sermons, Teachings & Ministries</title>
+<meta name="description" content="Rev. Isaac and Rev. Mrs. Edith Mpamaugo — a lifetime of Gospel ministry, sermons, Bible teaching, missions, and community outreach. Listen, be encouraged, or get in touch.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -47,6 +47,12 @@ header{position:sticky;top:0;z-index:100;background:rgba(250,247,242,.92);backdr
 .menu a{font-size:.92rem;font-weight:500;color:var(--muted);padding:6px 0;position:relative;transition:.2s}
 .menu a:hover,.menu a.active{color:var(--ink)}
 .menu a.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--gold)}
+.has-dropdown{position:relative}
+.has-dropdown>.dropdown{display:none;position:absolute;top:calc(100% + 8px);left:-16px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 0;min-width:170px;box-shadow:var(--shadow);z-index:200;list-style:none}
+.has-dropdown:hover>.dropdown{display:block}
+.has-dropdown>.dropdown li a{display:block;padding:9px 20px;font-size:.88rem;font-weight:500;color:var(--muted);white-space:nowrap;transition:.15s}
+.has-dropdown>.dropdown li a:hover{color:var(--ink);background:var(--cream)}
+.has-dropdown>.dropdown li a::after{display:none}
 .nav-cta{display:flex;align-items:center;gap:16px}
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
 .hamburger span{width:24px;height:2px;background:var(--ink);transition:.3s}
@@ -204,15 +210,22 @@ footer p{font-size:.92rem;margin-bottom:8px}
   <div class="wrap nav">
     <div class="logo" onclick="go('home')">
       <div class="mark">IM</div>
-      <div class="name">Rev. Isaac Mpamaugo<small>Ministry of the Word</small></div>
+      <div class="name">Rev. Isaac Mpamaugo<small>& Rev. Mrs. Edith Mpamaugo</small></div>
     </div>
     <ul class="menu" id="menu">
       <li><a data-nav="home" onclick="go('home')">Home</a></li>
       <li><a data-nav="about" onclick="go('about')">About</a></li>
-      <li><a data-nav="ministry" onclick="go('ministry')">Ministry</a></li>
+      <li class="has-dropdown">
+        <a data-nav="ministries" onclick="go('ministries')">Ministries</a>
+        <ul class="dropdown">
+          <li><a onclick="go('ministries')">Our Ministries</a></li>
+          <li><a onclick="go('missions')">Missions</a></li>
+        </ul>
+      </li>
       <li><a data-nav="sermons" onclick="go('sermons')">Sermons</a></li>
       <li><a data-nav="teachings" onclick="go('teachings')">Teachings</a></li>
       <li><a data-nav="events" onclick="go('events')">Events</a></li>
+      <li><a data-nav="give" onclick="go('give')">Give</a></li>
       <li><a data-nav="contact" onclick="go('contact')">Contact</a></li>
     </ul>
     <div class="nav-cta">
@@ -227,7 +240,7 @@ footer p{font-size:.92rem;margin-bottom:8px}
   <section class="hero">
     <div class="wrap">
       <h1>Faithful Service.<br>Timeless Truth.</h1>
-      <p>For over 50 years, Rev. Isaac Mpamaugo has preached the Gospel and shepherded God's people. Today he and his wife Rev. Mrs. Edith Mpamaugo share a lifetime of sermons and teaching with all who are seeking.</p>
+      <p>For over 50 years, Rev. Isaac Mpamaugo and his co-ministry partner Rev. Mrs. Edith Mpamaugo have preached the Gospel, served the church, and loved God's people together. This is their lifetime of sermons, teaching, and ministry — shared with all who are seeking.</p>
       <div class="btns">
         <button class="btn btn-gold" onclick="go('sermons')">Listen to a Sermon</button>
         <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.5)" onclick="go('contact')">Get in Touch</button>
@@ -240,7 +253,7 @@ footer p{font-size:.92rem;margin-bottom:8px}
       <div><div class="num">50+</div><div class="lbl">Years in Ministry</div></div>
       <div><div class="num">200</div><div class="lbl">Congregations Served</div></div>
       <div><div class="num">Hundreds</div><div class="lbl">Sermons & Teachings</div></div>
-      <div><div class="num">50</div><div class="lbl">Years of Shared Ministry</div></div>
+      <div><div class="num">1,500+</div><div class="lbl">Widows Served Annually</div></div>
     </div>
   </div>
 
@@ -250,19 +263,19 @@ footer p{font-size:.92rem;margin-bottom:8px}
       <div class="grid g3">
         <div class="feature"><div class="ic">⚓</div><div><h3>Sermons That Endure</h3><p>Decades of preaching, gathered in one place to encourage your faith whenever you need it.</p></div></div>
         <div class="feature"><div class="ic">📖</div><div><h3>Rooted in Scripture</h3><p>Clear, practical Bible teaching for everyday Christian living, marriage, and family.</p></div></div>
-        <div class="feature"><div class="ic">🤝</div><div><h3>A Shared Calling</h3><p>The fruit of a lifetime of ministry by Rev. Isaac and his wife Rev. Mrs. Edith Mpamaugo, side by side.</p></div></div>
+        <div class="feature"><div class="ic">🤝</div><div><h3>A Shared Calling</h3><p>Rev. Isaac and his co-ministry partner Rev. Mrs. Edith Mpamaugo have walked this road together for over 50 years — preaching, teaching, and serving side by side.</p></div></div>
       </div>
     </div>
   </section>
 
   <section class="section alt">
     <div class="wrap split">
-      <img src="http://revisaacmpamaugo.online/wp-content/uploads/2026/06/DaddyMummyPortraitv1.png" alt="Portrait of a dignified older minister">
+      <img src="http://revisaacmpamaugo.online/wp-content/uploads/2026/06/DaddyMummyPortraitv1.png" alt="Rev. Isaac and Rev. Mrs. Edith Mpamaugo">
       <div>
         <div class="eyebrow">Our Story</div>
         <h2>A Life Given to the Gospel</h2>
-        <p>Rev. Isaac Mpamaugo answered the call to ministry as a young man and has spent his life pointing people to Christ. Alongside his wife Rev. Mrs. Edith Mpamaugo, he has pastored, taught, counseled, and prayed with countless families.</p>
-        <p>Though now retired from the pulpit, his calling has never stopped — it simply found a new way to reach you.</p>
+        <p>Rev. Isaac Mpamaugo answered God's call to ministry as a young man. Beside him every step of the way has been his co-ministry partner Rev. Mrs. Edith Mpamaugo — together they have pastored, taught, counseled, led missions, and prayed with countless families across Nigeria and beyond.</p>
+        <p>Though Rev. Isaac is now retired from full-time pastoral duties, neither has stopped. Their calling simply found a new way to reach you.</p>
         <button class="btn btn-primary" onclick="go('about')">Read Their Story</button>
       </div>
     </div>
@@ -298,7 +311,7 @@ footer p{font-size:.92rem;margin-bottom:8px}
   <section class="section" style="padding-top:0">
     <div class="wrap"><div class="cta-band"><div class="inner">
       <h2>However far the road, grace reaches further.</h2>
-      <p>Reach out for prayer, an encouraging word, or to invite Rev. Isaac to minister.</p>
+      <p>Reach out for prayer, an encouraging word, or to invite Rev. Isaac or Rev. Mrs. Edith to minister.</p>
       <button class="btn btn-gold" onclick="go('contact')">Get in Touch</button>
     </div></div></div>
   </section>
@@ -306,14 +319,14 @@ footer p{font-size:.92rem;margin-bottom:8px}
 
 <!-- ================= ABOUT ================= -->
 <main id="about" class="page">
-  <section class="phero"><div class="wrap"><div class="eyebrow">About</div><h1>Our Story</h1><p>A lifetime of faithful service to the Gospel of Jesus Christ.</p></div></section>
+  <section class="phero"><div class="wrap"><div class="eyebrow">About</div><h1>Their Story</h1><p>Two lives, one calling — a lifetime of faithful service to the Gospel of Jesus Christ.</p></div></section>
   <section class="section">
     <div class="wrap" style="max-width:820px">
-      <p class="lead" style="margin-bottom:24px">Rev. Isaac Mpamaugo's life has been marked by one steady conviction: that the Gospel changes everything.</p>
-      <p style="margin-bottom:18px;color:var(--muted)">He came to faith as a young man and soon after sensed God's unmistakable call to serve. Over the decades that followed he pastored churches, planted and strengthened congregations, and preached across Nigeria, Africa, and many other nations, walking with his people through joys and trials alike.</p>
-      <p style="margin-bottom:18px;color:var(--muted)">His leadership reached well beyond his own pulpit. He served as District Superintendent of the Assemblies of God, Lagos District, and became the first Chairman of the Pentecostal Fellowship of Nigeria (PFN) in Lagos, helping to unite churches across the city during the formative years of 1986 to 1990.</p>
-      <p style="margin-bottom:18px;color:var(--muted)">None of it was done alone. He and his wife Rev. Mrs. (Dr.) Edith Mpamaugo have shared this calling for over 50 years — she is the co-founder and convener of the Life Support Foundation, which since 1996 has cared for vulnerable widows in Lagos, providing free medical outreach, food, and financial empowerment to well over 1,500 widows every year. Together they built a ministry defined less by titles than by faithfulness: showing up, praying long, and loving people through every season.</p>
-      <p style="color:var(--muted)">Now retired from full-time pastoral duties, Rev. Isaac continues to teach, mentor, and preach when invited. This site is where the sermons and lessons of a lifetime are kept — not as a museum, but as a living well anyone can draw from.</p>
+      <p class="lead" style="margin-bottom:24px">Rev. Isaac and Rev. Mrs. Edith Mpamaugo have shared one conviction for over 50 years: that the Gospel changes everything — and that a life given to proclaiming it is a life well spent.</p>
+      <p style="margin-bottom:18px;color:var(--muted)">Rev. Isaac came to faith as a young man and soon after sensed God's unmistakable call to serve. Over the decades that followed he pastored churches, planted and strengthened congregations, and preached across Nigeria, Africa, and many other nations, walking with his people through joys and trials alike.</p>
+      <p style="margin-bottom:18px;color:var(--muted)">His leadership reached well beyond his own pulpit. Rev. Isaac served as District Superintendent of the Assemblies of God, Lagos District, and became the first Chairman of the Pentecostal Fellowship of Nigeria (PFN) in Lagos, helping to unite churches across the city during the formative years of 1986 to 1990.</p>
+      <p style="margin-bottom:18px;color:var(--muted)">None of it was done alone. Rev. Mrs. (Dr.) Edith Mpamaugo has been his co-ministry partner from the beginning — standing alongside him in the pulpit, the home, and the community. She is the co-founder and convener of the Life Support Foundation, which since 1996 has cared for vulnerable widows in Lagos, providing free medical outreach, food, and financial empowerment to well over 1,500 widows every year. Together, Rev. Isaac and Rev. Mrs. Edith built a ministry defined less by titles than by faithfulness: showing up, praying long, and loving people through every season.</p>
+      <p style="color:var(--muted)">Now retired from full-time pastoral duties, Rev. Isaac continues to teach, mentor, and preach when invited — and Rev. Mrs. Edith continues her work with the Life Support Foundation and her own ministry to women and families. This site is where the sermons and lessons of a lifetime are kept — not as a museum, but as a living well anyone can draw from.</p>
     </div>
   </section>
   <section class="section alt">
@@ -335,28 +348,46 @@ footer p{font-size:.92rem;margin-bottom:8px}
   </section>
 </main>
 
-<!-- ================= MINISTRY ================= -->
-<main id="ministry" class="page">
-  <section class="phero"><div class="wrap"><div class="eyebrow">Ministry</div><h1>How Rev. Isaac Serves</h1><p>A lifetime of ministry takes many forms. Here are the ways he continues to serve the church and individual believers today.</p></div></section>
+<!-- ================= MINISTRIES ================= -->
+<main id="ministries" class="page">
+  <section class="phero"><div class="wrap"><div class="eyebrow">Ministries</div><h1>How Rev. Isaac & Rev. Mrs. Edith Serve</h1><p>A lifetime of ministry takes many forms. Here are the ways Rev. Isaac and his co-ministry partner Rev. Mrs. Edith Mpamaugo continue to serve the church, the community, and individual believers today.</p></div></section>
   <section class="section">
     <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Rev. Isaac Mpamaugo</div><h2>His Ministry</h2></div>
       <div class="grid g3">
-        <div class="feature"><div class="ic">🎙️</div><div><h3>Preaching</h3><p>Gospel-centered messages for Sundays, conferences, conventions, and special gatherings.</p></div></div>
-        <div class="feature"><div class="ic">📖</div><div><h3>Bible Teaching</h3><p>Verse-by-verse and topical teaching that makes Scripture clear and applicable.</p></div></div>
-        <div class="feature"><div class="ic">🙏</div><div><h3>Pastoral Care & Prayer</h3><p>A listening ear, counsel, and faithful prayer for those facing difficulty.</p></div></div>
-        <div class="feature"><div class="ic">💍</div><div><h3>Marriage & Family</h3><p>Wisdom from over 50 years of marriage and ministry, offered with his wife Rev. Mrs. Edith Mpamaugo.</p></div></div>
-        <div class="feature"><div class="ic">🌱</div><div><h3>Mentoring Ministers</h3><p>Encouraging and guiding younger pastors and church leaders.</p></div></div>
-        <div class="feature"><div class="ic">❤️</div><div><h3>Widows & Community Outreach</h3><p>Through the Life Support Foundation, caring for vulnerable widows in Lagos with medical outreach, food, and empowerment.</p></div></div>
+        <div class="feature"><div class="ic">🎙️</div><div><h3>Preaching</h3><p>Gospel-centered messages for Sundays, conferences, conventions, and special gatherings — Rev. Isaac's hallmark for over five decades.</p></div></div>
+        <div class="feature"><div class="ic">📖</div><div><h3>Bible Teaching</h3><p>Verse-by-verse and topical teaching that makes Scripture clear and applicable to everyday life.</p></div></div>
+        <div class="feature"><div class="ic">🌱</div><div><h3>Mentoring Ministers</h3><p>Rev. Isaac invests in younger pastors and church leaders, sharing hard-won wisdom from a lifetime of pastoral ministry.</p></div></div>
       </div>
     </div>
   </section>
   <section class="section alt">
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">Invite Rev. Isaac</div><h2>How to Invite Him</h2></div>
+      <div class="section-head"><div class="eyebrow">Rev. Mrs. Edith Mpamaugo</div><h2>Her Ministry</h2></div>
+      <div class="grid g3">
+        <div class="feature"><div class="ic">❤️</div><div><h3>Life Support Foundation</h3><p>Co-founder and convener of the Life Support Foundation — since 1996 providing medical outreach, food, and empowerment to over 1,500 vulnerable widows in Lagos each year.</p></div></div>
+        <div class="feature"><div class="ic">👩‍👧</div><div><h3>Ministry to Women & Families</h3><p>Rev. Mrs. Edith brings decades of wisdom to women's ministry, family life, and pastoral care — a gifted minister in her own right.</p></div></div>
+        <div class="feature"><div class="ic">🙏</div><div><h3>Prayer & Pastoral Care</h3><p>A faithful intercessor and counselor — Rev. Mrs. Edith carries the burdens of God's people with compassion and faith.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Together</div><h2>Their Shared Ministry</h2></div>
+      <div class="grid g3">
+        <div class="feature"><div class="ic">💍</div><div><h3>Marriage & Family</h3><p>Wisdom from over 50 years of marriage and ministry — Rev. Isaac and Rev. Mrs. Edith minister together to couples and families.</p></div></div>
+        <div class="feature"><div class="ic">✈️</div><div><h3>Missions</h3><p>A heart for the nations: Rev. Isaac and Rev. Mrs. Edith have carried the Gospel across Nigeria, Africa, and beyond. See the <a onclick="go('missions')" style="color:var(--burgundy);font-weight:600;cursor:pointer">Missions</a> page.</p></div></div>
+        <div class="feature"><div class="ic">⚓</div><div><h3>A Lifetime of Faithfulness</h3><p>Fifty years of standing together — in the pulpit, in the home, in the community. Two callings, one purpose.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Invite Them</div><h2>How to Invite Rev. Isaac or Rev. Mrs. Edith</h2></div>
       <div class="steps">
-        <div class="step"><div class="n"></div><h3>Reach Out</h3><p>Send a message through the Contact page with your event or need.</p></div>
-        <div class="step"><div class="n"></div><h3>We Talk It Through</h3><p>Dates, theme, audience, and how he can best serve.</p></div>
-        <div class="step"><div class="n"></div><h3>He Ministers</h3><p>In person where possible, or by recorded message where not.</p></div>
+        <div class="step"><div class="n"></div><h3>Reach Out</h3><p>Send a message through the Contact page with your event, occasion, or need.</p></div>
+        <div class="step"><div class="n"></div><h3>We Talk It Through</h3><p>Dates, theme, audience, and how Rev. Isaac or Rev. Mrs. Edith can best serve your gathering.</p></div>
+        <div class="step"><div class="n"></div><h3>They Minister</h3><p>In person where possible, or by recorded message where not.</p></div>
       </div>
     </div>
   </section>
@@ -364,11 +395,11 @@ footer p{font-size:.92rem;margin-bottom:8px}
     <div class="wrap">
       <div class="section-head"><div class="eyebrow">Questions</div><h2>Frequently Asked</h2></div>
       <div class="faq">
-        <div class="qa"><button onclick="toggleFaq(this)">Is Rev. Isaac available to preach or speak at events?<span class="plus">+</span></button><div class="ans"><p>Yes, as his schedule allows. Use the Contact page to share the date, location, and occasion, and we'll respond.</p></div></div>
+        <div class="qa"><button onclick="toggleFaq(this)">Are Rev. Isaac or Rev. Mrs. Edith available to preach or speak at events?<span class="plus">+</span></button><div class="ans"><p>Yes, as their schedule allows. Use the Contact page to share the date, location, and occasion, and we'll respond.</p></div></div>
         <div class="qa"><button onclick="toggleFaq(this)">Can I request prayer?<span class="plus">+</span></button><div class="ans"><p>Absolutely. Send your request through the Contact form. Every request is read and prayed over.</p></div></div>
         <div class="qa"><button onclick="toggleFaq(this)">Are the sermons free to share?<span class="plus">+</span></button><div class="ans"><p>Yes. You're welcome to share them with anyone who would be encouraged by them.</p></div></div>
-        <div class="qa"><button onclick="toggleFaq(this)">Does he offer counseling or pastoral advice?<span class="plus">+</span></button><div class="ans"><p>He offers prayer and spiritual encouragement. For ongoing pastoral or professional counseling, he's glad to point you to trusted resources.</p></div></div>
-        <div class="qa"><button onclick="toggleFaq(this)">How can I support the ministry?<span class="plus">+</span></button><div class="ans"><p>Your prayers and your sharing of these messages are a real encouragement. If you'd like to partner with the widows' outreach of the Life Support Foundation, mention it in your message and we'll be glad to share how.</p></div></div>
+        <div class="qa"><button onclick="toggleFaq(this)">Does Rev. Isaac offer counseling or pastoral advice?<span class="plus">+</span></button><div class="ans"><p>Rev. Isaac offers prayer and spiritual encouragement. For ongoing pastoral or professional counseling, he's glad to point you to trusted resources.</p></div></div>
+        <div class="qa"><button onclick="toggleFaq(this)">How can I support the ministry?<span class="plus">+</span></button><div class="ans"><p>Your prayers and your sharing of these messages are a real encouragement. To give financially, see the <a onclick="go('give')" style="color:var(--burgundy);font-weight:600;cursor:pointer">Give</a> page. To partner with the widows' outreach of the Life Support Foundation, mention it in your message.</p></div></div>
       </div>
       <div class="center" style="margin-top:48px"><button class="btn btn-primary" onclick="go('contact')">Have something on your heart?</button></div>
     </div>
@@ -437,6 +468,140 @@ footer p{font-size:.92rem;margin-bottom:8px}
   </section>
 </main>
 
+<!-- ================= MISSIONS ================= -->
+<main id="missions" class="page">
+  <section class="phero"><div class="wrap"><div class="eyebrow">Missions</div><h1>Taking the Gospel to the Nations</h1><p>Rev. Isaac and Rev. Mrs. Edith Mpamaugo have carried the Gospel beyond the walls of any single church — across Nigeria, the African continent, and beyond. Missions is not a programme; it is a conviction.</p></div></section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">A Heart for the Nations</div><h2>Their Missionary Story</h2></div>
+      <div class="two-col">
+        <div>
+          <p style="color:var(--muted);margin-bottom:18px">From the earliest years of ministry, Rev. Isaac Mpamaugo understood that the Great Commission is not optional. He and Rev. Mrs. Edith have preached at crusades, conventions, and evangelistic gatherings across Nigeria — carrying straightforward, Christ-centred messages to crowds in city squares, churches, and open fields alike.</p>
+          <p style="color:var(--muted);margin-bottom:18px">Their missionary work has taken them to communities often overlooked by larger ministries — rural towns, underserved neighbourhoods, and marginalised communities where the Gospel is both needed and welcomed. Rev. Mrs. Edith's outreach through the Life Support Foundation extends this missionary impulse into practical compassion: meeting widows not only with Scripture but with food, medical care, and dignity.</p>
+          <p style="color:var(--muted)">Together, they have modelled what it means to be both a preaching ministry and a serving ministry — believing that the Gospel proclaimed and the Gospel demonstrated belong together.</p>
+        </div>
+        <div class="img-block" style="background:var(--cream);border-radius:18px;min-height:280px;display:flex;align-items:center;justify-content:center">
+          <img src="https://images.unsplash.com/photo-1504805572947-34fad45aed93?auto=format&fit=crop&w=600&q=80" alt="Missions and outreach" style="width:100%;border-radius:18px;object-fit:cover;height:280px">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Areas of Outreach</div><h2>Where They Have Served</h2></div>
+      <div class="grid g3">
+        <div class="feature"><div class="ic">🇳🇬</div><div><h3>Nigeria</h3><p>Evangelistic crusades, church conferences, and pastoral visits across Lagos, the South-East, and beyond — Rev. Isaac and Rev. Mrs. Edith have ministered in many of Nigeria's thirty-six states.</p></div></div>
+        <div class="feature"><div class="ic">🌍</div><div><h3>Africa</h3><p>A continent-wide burden: Rev. Isaac has preached at international conventions and ministry gatherings across West and East Africa, carrying the same faithful message wherever he goes.</p></div></div>
+        <div class="feature"><div class="ic">✈️</div><div><h3>Beyond Africa</h3><p>At God's direction and by gracious invitation, both Rev. Isaac and Rev. Mrs. Edith have ministered in the diaspora — speaking into the lives of Nigerian communities abroad and international congregations.</p></div></div>
+        <div class="feature"><div class="ic">🏥</div><div><h3>Medical Outreach</h3><p>The Life Support Foundation's annual widows' outreach — co-founded and convened by Rev. Mrs. Edith — brings free medical care, food parcels, and empowerment to over 1,500 widows in Lagos each year.</p></div></div>
+        <div class="feature"><div class="ic">👩‍👧</div><div><h3>Women & Families</h3><p>Rev. Mrs. Edith's ministry to women crosses borders and generations — discipling, counselling, and equipping wives, mothers, and daughters to stand firm in faith and family.</p></div></div>
+        <div class="feature"><div class="ic">🌱</div><div><h3>Church Planting & Mentoring</h3><p>Rev. Isaac has mentored pastors and church leaders across Nigeria, pouring hard-won wisdom into the next generation of ministers so the work outlasts any one life.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Partner With Us</div><h2>Join the Missionary Work</h2></div>
+      <div class="two-col">
+        <div>
+          <p style="color:var(--muted);margin-bottom:18px">The work of missions costs something — time, prayer, and practical partnership. If God has stirred your heart to be part of what Rev. Isaac and Rev. Mrs. Edith are doing, there are several ways to be involved.</p>
+          <div class="grid g2" style="margin-top:24px">
+            <div class="feature"><div class="ic">🙏</div><div><h3>Pray</h3><p>The most important thing. Ask for open doors, travelling mercies, and fruitful ministry every time they go.</p></div></div>
+            <div class="feature"><div class="ic">💰</div><div><h3>Give</h3><p>Financial partnership sustains the outreach, the widows' programme, and the costs of travel and ministry. See the <a onclick="go('give')" style="color:var(--burgundy);font-weight:600;cursor:pointer">Give</a> page.</p></div></div>
+            <div class="feature"><div class="ic">📣</div><div><h3>Share</h3><p>Spread the sermons, teachings, and testimonies of what God has done — every share is a small act of mission.</p></div></div>
+            <div class="feature"><div class="ic">✉️</div><div><h3>Invite</h3><p>Hosting Rev. Isaac or Rev. Mrs. Edith for a crusade, conference, or convention? Reach out via the <a onclick="go('contact')" style="color:var(--burgundy);font-weight:600;cursor:pointer">Contact</a> page.</p></div></div>
+          </div>
+        </div>
+        <div style="background:var(--cream);border-radius:18px;padding:36px">
+          <div class="eyebrow">A word from Rev. Isaac</div>
+          <blockquote style="font-family:var(--serif);font-size:1.25rem;line-height:1.7;color:var(--ink);margin:16px 0 0;font-style:italic">"The Gospel is too good to keep to yourself. Every believer is a missionary — some go far, some go next door. But we all go."</blockquote>
+          <p style="margin-top:16px;color:var(--muted);font-size:.9rem">— Rev. Isaac Mpamaugo</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-band">
+    <div class="wrap center">
+      <h2>Ready to partner with the mission?</h2>
+      <p>Pray, give, share, or invite — every act of partnership counts.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px">
+        <button class="btn btn-gold" onclick="go('give')">Give Now</button>
+        <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.5)" onclick="go('contact')">Get in Touch</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= GIVE ================= -->
+<main id="give" class="page">
+  <section class="phero"><div class="wrap"><div class="eyebrow">Give</div><h1>Partner With This Ministry</h1><p>Every gift — however large or small — sustains the preaching of the Gospel, the widows' outreach, and the teaching ministry of Rev. Isaac and Rev. Mrs. Edith Mpamaugo. Thank you for your generosity.</p></div></section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Why Give?</div><h2>Your Gift at Work</h2></div>
+      <div class="grid g3">
+        <div class="feature"><div class="ic">📖</div><div><h3>Sermons & Teachings</h3><p>Keeping this archive free and accessible to everyone — anywhere in the world — so that no one is turned away from the Word of God because they cannot afford it.</p></div></div>
+        <div class="feature"><div class="ic">❤️</div><div><h3>Widows' Outreach</h3><p>The Life Support Foundation — co-founded and led by Rev. Mrs. Edith Mpamaugo — reaches over 1,500 vulnerable widows in Lagos each year with free medical care, food, and financial empowerment. Your gift helps fund every item in that outreach.</p></div></div>
+        <div class="feature"><div class="ic">✈️</div><div><h3>Missions & Evangelism</h3><p>Covering the costs of travel, logistics, and materials so that Rev. Isaac and Rev. Mrs. Edith can continue to take the Gospel to churches, crusades, and communities across Nigeria and beyond.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Give Securely</div><h2>How to Give</h2></div>
+      <div class="two-col">
+        <div>
+          <h3 style="margin-bottom:12px;font-family:var(--serif)">Bank Transfer</h3>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:24px;margin-bottom:24px">
+            <p style="margin-bottom:8px"><b>Account Name:</b> The Ministry of Rev. Isaac Mpamaugo</p>
+            <p style="margin-bottom:8px"><b>Bank:</b> [Bank Name]</p>
+            <p style="margin-bottom:8px"><b>Account Number:</b> [Account Number]</p>
+            <p style="color:var(--muted);font-size:.9rem;margin-top:12px">For international transfers, please contact us for SWIFT/IBAN details.</p>
+          </div>
+          <h3 style="margin-bottom:12px;font-family:var(--serif)">Life Support Foundation</h3>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:24px">
+            <p style="margin-bottom:8px"><b>Account Name:</b> Life Support Foundation</p>
+            <p style="margin-bottom:8px"><b>Bank:</b> [Bank Name]</p>
+            <p style="margin-bottom:8px"><b>Account Number:</b> [Account Number]</p>
+            <p style="color:var(--muted);font-size:.9rem;margin-top:12px">Gifts to the Foundation go directly to widows' outreach and community care.</p>
+          </div>
+        </div>
+        <div>
+          <div style="background:var(--cream);border-radius:18px;padding:36px;margin-bottom:24px">
+            <div class="eyebrow">A Note of Gratitude</div>
+            <p style="color:var(--muted);margin-top:12px;line-height:1.8">Every gift we receive is prayed over. We do not take your generosity for granted. Whether you give once or give regularly, your partnership is felt — in every widow fed, every message broadcast, and every soul that hears the Gospel because you made it possible.</p>
+            <p style="color:var(--muted);margin-top:12px;line-height:1.8">Thank you, from Rev. Isaac and Rev. Mrs. Edith Mpamaugo.</p>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--line);border-radius:12px;padding:24px">
+            <h3 style="margin-bottom:10px;font-family:var(--serif)">Questions About Giving?</h3>
+            <p style="color:var(--muted);margin-bottom:16px">If you'd like to discuss your gift, set up a standing order, or give in a specific direction, please get in touch.</p>
+            <button class="btn btn-primary" onclick="go('contact')">Contact Us</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head"><div class="eyebrow">Other Ways to Give</div><h2>More Than Money</h2></div>
+      <div class="grid g3">
+        <div class="feature"><div class="ic">🙏</div><div><h3>Prayer Partnership</h3><p>Commit to praying regularly for the ministry, the missions, and the widows' outreach. This is the most powerful form of partnership we know.</p></div></div>
+        <div class="feature"><div class="ic">📣</div><div><h3>Share the Messages</h3><p>Share a sermon or teaching with someone who needs it. Spread the word about the Life Support Foundation's work. Every share extends the reach.</p></div></div>
+        <div class="feature"><div class="ic">🤝</div><div><h3>Volunteer</h3><p>Are you in Lagos and want to serve at the annual widows' outreach? Contact us — there is always a place for willing hands.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="cta-band">
+    <div class="wrap center">
+      <h2>Every gift is a seed sown in faith.</h2>
+      <p>We are grateful for every partner who stands with this ministry.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:32px">
+        <button class="btn btn-gold" onclick="go('contact')">Get in Touch to Give</button>
+        <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.5)" onclick="go('missions')">See Our Missions</button>
+      </div>
+    </div>
+  </section>
+</main>
+
 <!-- MODAL -->
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
@@ -450,8 +615,8 @@ footer p{font-size:.92rem;margin-bottom:8px}
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <div class="logo" style="margin-bottom:16px"><div class="mark">IM</div><div class="name" style="color:#fff">Rev. Isaac Mpamaugo<small>Ministry of the Word</small></div></div>
-        <p>A lifetime of faithful service, sermons, and teaching — shared by Rev. Isaac and Rev. Mrs. Edith Mpamaugo.</p>
+        <div class="logo" style="margin-bottom:16px"><div class="mark">IM</div><div class="name" style="color:#fff">Rev. Isaac Mpamaugo<small>& Rev. Mrs. Edith Mpamaugo</small></div></div>
+        <p>A lifetime of faithful service, sermons, teaching, and outreach — shared together by Rev. Isaac and Rev. Mrs. Edith Mpamaugo.</p>
         <div class="foot-socials"><a title="Facebook">f</a><a title="YouTube">▶</a><a title="Instagram">◎</a></div>
       </div>
       <div>
@@ -459,10 +624,12 @@ footer p{font-size:.92rem;margin-bottom:8px}
         <ul>
           <li><a onclick="go('home')">Home</a></li>
           <li><a onclick="go('about')">About</a></li>
-          <li><a onclick="go('ministry')">Ministry</a></li>
+          <li><a onclick="go('ministries')">Ministries</a></li>
+          <li><a onclick="go('missions')">Missions</a></li>
           <li><a onclick="go('sermons')">Sermons</a></li>
           <li><a onclick="go('teachings')">Teachings</a></li>
           <li><a onclick="go('events')">Events</a></li>
+          <li><a onclick="go('give')">Give</a></li>
         </ul>
       </div>
       <div>
@@ -473,7 +640,7 @@ footer p{font-size:.92rem;margin-bottom:8px}
         <button class="btn btn-gold" style="margin-top:12px" onclick="go('contact')">Get in Touch</button>
       </div>
     </div>
-    <div class="foot-bottom">© <span id="yr"></span> The Ministry of Rev. Isaac Mpamaugo. All rights reserved.</div>
+    <div class="foot-bottom">© <span id="yr"></span> The Ministry of Rev. Isaac & Rev. Mrs. Edith Mpamaugo. All rights reserved.</div>
   </div>
 </footer>
 

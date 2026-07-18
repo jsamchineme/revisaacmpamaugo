@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface MediaPickerProps {
   value: string;
@@ -20,9 +20,10 @@ export function MediaPicker({ value, onChange, label = "Image" }: MediaPickerPro
   const [open, setOpen] = useState(false);
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
+  function fetchMedia() {
     setLoading(true);
     fetch("/api/admin/media")
       .then((res) => (res.ok ? res.json() : []))
@@ -34,7 +35,37 @@ export function MediaPicker({ value, onChange, label = "Image" }: MediaPickerPro
         setMedia([]);
         setLoading(false);
       });
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    fetchMedia();
   }, [open]);
+
+  async function handleFileUpload(file: File) {
+    if (!file.type.startsWith("image/")) return;
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/admin/media", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        onChange(data.url);
+        setOpen(false);
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <div>
@@ -80,21 +111,51 @@ export function MediaPicker({ value, onChange, label = "Image" }: MediaPickerPro
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-line">
               <h3 className="font-serif text-lg font-semibold text-ink">Media Library</h3>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-muted hover:text-ink text-xl leading-none"
-              >
-                &times;
-              </button>
+              <div className="flex items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="px-3 py-1.5 bg-burgundy text-white rounded-lg text-sm hover:bg-burgundy-dark transition-colors disabled:opacity-50"
+                >
+                  {uploading ? "Uploading..." : "+ Upload New"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="text-muted hover:text-ink text-xl leading-none"
+                >
+                  &times;
+                </button>
+              </div>
             </div>
             <div className="overflow-y-auto p-5 flex-1">
               {loading ? (
                 <p className="text-muted text-sm text-center py-8">Loading media...</p>
               ) : media.length === 0 ? (
-                <p className="text-muted text-sm text-center py-8">
-                  No media found. Upload images in the Media section first.
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-muted text-sm mb-4">
+                    No media found. Upload your first image.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-2 bg-burgundy text-white rounded-lg text-sm hover:bg-burgundy-dark transition-colors"
+                  >
+                    Upload Image
+                  </button>
+                </div>
               ) : (
                 <div className="grid grid-cols-4 gap-3">
                   {media

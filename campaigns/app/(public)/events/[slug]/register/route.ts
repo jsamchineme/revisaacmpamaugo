@@ -11,14 +11,14 @@ const guestSchema = z.object({
 });
 
 const registrationSchema = z.object({
-  title: z.enum(["Mr", "Mrs", "Ms", "Dr"]),
+  title: z.enum(["Mr", "Mrs", "Ms", "Dr"]).optional().or(z.literal("")),
   fullname: z.string().min(1, "Full name is required"),
   phone: z.string().regex(/^\+[1-9][0-9]{7,14}$/, "Phone must be in E.164 format (e.g., +2348012345678)"),
   email: z.string().email("Valid email required").optional().or(z.literal("")),
-  plusOne: z.boolean(),
-  plusOneGuests: z.array(guestSchema).max(5, "Maximum 5 guests allowed"),
-  whatsappOptIn: z.boolean(),
-});
+  plusOne: z.boolean().default(false),
+  plusOneGuests: z.array(guestSchema).max(5, "Maximum 5 guests allowed").default([]),
+  whatsappOptIn: z.boolean().default(false),
+}).passthrough();
 
 function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -88,18 +88,28 @@ export async function POST(
       );
     }
 
-    const { title, fullname, phone, email, plusOne, plusOneGuests, whatsappOptIn } = parsed.data;
+    const { title, fullname, phone, email, plusOne, plusOneGuests, whatsappOptIn, ...rest } = parsed.data;
+
+    // Extract known fields, store the rest as customData
+    const knownFields = new Set(["title", "fullname", "phone", "email", "plusOne", "plusOneGuests", "whatsappOptIn"]);
+    const customData: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rest)) {
+      if (!knownFields.has(key)) {
+        customData[key] = value;
+      }
+    }
 
     const registration = await prisma.registration.create({
       data: {
         eventId: event.id,
-        title,
+        title: title || "Mr",
         fullname,
         phone,
         email: email || null,
         plusOne,
         plusOneGuests: plusOneGuests.length > 0 ? JSON.stringify(plusOneGuests) : null,
         whatsappOptIn,
+        customData: Object.keys(customData).length > 0 ? JSON.stringify(customData) : null,
       },
     });
 

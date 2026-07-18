@@ -56,6 +56,8 @@ export default async function EventPage({ params }: EventPageProps) {
         description: event.description,
         capacity: event.capacity,
         imageUrl: event.imageUrl,
+        designContent: event.designContent,
+        formConfig: event.formConfig,
       }}
       registrationCount={registrationCount}
       isPast={isPast}
