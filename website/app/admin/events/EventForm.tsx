@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TiptapEditor } from "@/components/admin/tiptap/TiptapEditor";
 
 interface EventFormData {
   title: string;
@@ -167,14 +168,11 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Body (TipTap JSON)</label>
-        <textarea
-          name="body"
+        <label className="text-sm font-medium">Body</label>
+        <TiptapEditor
           value={formData.body}
-          onChange={handleChange}
-          rows={10}
-          placeholder='{"type":"doc","content":[...]}'
-          className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold font-mono text-sm"
+          onChange={(html) => setFormData((prev) => ({ ...prev, body: html }))}
+          placeholder="Write the event body..."
         />
       </div>
 

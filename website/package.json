@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "__NEXT_PRIVATE_STANDALONE_CONFIG= next dev",
+    "build": "__NEXT_PRIVATE_STANDALONE_CONFIG= next build",
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",

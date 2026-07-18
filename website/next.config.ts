@@ -3,11 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
 
-  // Fix Turbopack workspace root detection when next to a WordPress install
-  turbopack: {
-    root: __dirname,
-  },
-
   // Unique deployment ID for version-skew protection across restarts
   deploymentId: process.env.DEPLOYMENT_ID,
 

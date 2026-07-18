@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+// ─── Campaigns ───────────────────────────────────────────────────────────────
+
+model Campaign {
+  id                      String   @id @default(cuid())
+  title                   String
+  whatsappTemplateSid     String?
+  whatsappTemplateVariables String?
+  emailBody               String?
+  link                    String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+// ─── Contacts ────────────────────────────────────────────────────────────────
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?  @unique
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── CampaignContact (join table) ────────────────────────────────────────────
+
+model CampaignContact {
+  id               String   @id @default(cuid())
+  trackingUuid     String   @unique
+  campaignId       String
+  contactId        String
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+
+  @@unique([campaignId, contactId])
+}
+
+// ─── Click Tracking ──────────────────────────────────────────────────────────
+
+model ClickEvent {
+  id                String   @id @default(cuid())
+  campaignContactId String
+  clickedAt         DateTime @default(now())
+  ipAddress         String?
+  userAgent         String?
+}
+
+// ─── Send Log ────────────────────────────────────────────────────────────────
+
+model SendLog {
+  id                String   @id @default(cuid())
+  campaignContactId String
+  channel           String
+  status            String
+  errorMessage      String?
+  sentAt            DateTime?
+  createdAt         DateTime @default(now())
+}
+
+// ─── Events ──────────────────────────────────────────────────────────────────
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  date        DateTime
+  description String?
+  capacity    Int?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── Registrations ───────────────────────────────────────────────────────────
+
+model Registration {
+  id             String   @id @default(cuid())
+  eventId        String
+  title          String
+  fullname       String
+  phone          String
+  email          String?
+  plusOne        Boolean  @default(false)
+  plusOneGuests  String?
+  whatsappOptIn  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+// ─── Rate Limiting ─────────────────────────────────────────────────────────────
+
+model RateLimit {
+  id          String   @id @default(cuid())
+  ip          String
+  endpoint    String
+  count       Int
+  windowStart DateTime
+
+  @@unique([ip, endpoint])
+}

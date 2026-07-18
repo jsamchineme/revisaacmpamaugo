@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "active_work_id": "campaigns-app",
+  "works": {
+    "campaigns-app": {
+      "work_id": "campaigns-app",
+      "active_plan": ".omo/plans/campaigns-app.md",
+      "plan_name": "campaigns-app",
+      "session_ids": ["codex:ses_08dc0f035ffe6iGkIWwDtb7EMW"],
+      "status": "active",
+      "worktree_path": null
+    }
+  }
+}
