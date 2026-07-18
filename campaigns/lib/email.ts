@@ -19,8 +19,13 @@ export async function sendEmail(
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: Number(SMTP_PORT ?? 587),
-      secure: Number(SMTP_PORT ?? 587) === 465,
+      secure: false,
+      requireTLS: true,
       auth: { user: SMTP_USER, pass: SMTP_PASS },
+      tls: {
+        ciphers: "SSLv3",
+        rejectUnauthorized: true,
+      },
     });
 
     const info = await transporter.sendMail({
@@ -30,9 +35,11 @@ export async function sendEmail(
       text: body,
     });
 
+    console.log(`Email sent to ${to}: ${info.messageId}`);
     return { success: true, messageId: info.messageId };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error(`Email failed to ${to}: ${errorMessage}`);
     return { success: false, error: errorMessage };
   }
 }

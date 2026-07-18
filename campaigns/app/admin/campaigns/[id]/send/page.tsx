@@ -9,13 +9,23 @@ interface Campaign {
   id: string;
   title: string;
   whatsappTemplateSid: string | null;
+  whatsappTemplateVariables: string | null;
   emailBody: string | null;
   link: string;
 }
 
+interface Contact {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+}
+
 interface CampaignContact {
   id: string;
+  trackingUuid: string;
   status: string;
+  contact: Contact | null;
 }
 
 interface SendResult {
@@ -60,6 +70,11 @@ export default function CampaignSendPage() {
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
 
+  // Message preview state
+  const [contacts, setContacts] = useState<CampaignContact[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState<string>("");
+  const [copied, setCopied] = useState(false);
+
   // Toast state
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
@@ -90,6 +105,7 @@ export default function CampaignSendPage() {
       const data: CampaignContact[] = await response.json();
       setContactCount(data.length);
       setSentCount(data.filter((cc) => cc.status === "sent" || cc.status === "failed").length);
+      setContacts(data);
     } catch (err) {
       // Non-critical — just can't show counts
     } finally {
@@ -206,6 +222,46 @@ export default function CampaignSendPage() {
     return total;
   }
 
+  function handleCopy() {
+    const text = getPreviewMessage();
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  function getAppUrl(): string {
+    if (typeof window !== "undefined") return window.location.origin;
+    return "";
+  }
+
+  function getTrackingUrl(): string {
+    const selected = contacts.find((c) => c.id === selectedContactId);
+    if (selected) return `${getAppUrl()}/c/${selected.trackingUuid}`;
+    return `${getAppUrl()}/c/[will-be-generated-on-send]`;
+  }
+
+  function getPreviewMessage(): string {
+    if (!campaign?.emailBody) return "";
+    return campaign.emailBody.replace(/\{\{link\}\}/g, getTrackingUrl());
+  }
+
+  function getWhatsAppVariables(): { name: string; value: string }[] {
+    const selected = contacts.find((c) => c.id === selectedContactId);
+    const trackingUrl = getTrackingUrl();
+    const contactName = selected?.contact?.name || "[Contact Name]";
+
+    const varNames = campaign?.whatsappTemplateVariables
+      ? campaign.whatsappTemplateVariables.split(",").map((v) => v.trim()).filter(Boolean)
+      : ["name", "link"];
+
+    return varNames.map((v) => {
+      if (v === "name") return { name: v, value: contactName };
+      if (v === "link") return { name: v, value: trackingUrl };
+      return { name: v, value: "[value]" };
+    });
+  }
+
   const alreadySent = sentCount > 0;
   const noContacts = contactCount === 0;
   const noChannelSelected = !sendWhatsapp && !sendEmail;
@@ -299,6 +355,89 @@ export default function CampaignSendPage() {
               {campaign.emailBody}
             </pre>
           </details>
+        )}
+      </div>
+
+      {/* Message Preview */}
+      <div className="bg-gray-50 border rounded-lg p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">Message Preview</h2>
+          <span className="text-xs text-muted bg-white px-2 py-1 rounded border border-line">
+            This is what your contacts will receive
+          </span>
+        </div>
+
+        {/* Contact selector */}
+        {contacts.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Preview for contact:</label>
+            <select
+              value={selectedContactId}
+              onChange={(e) => setSelectedContactId(e.target.value)}
+              className="w-full sm:w-80 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold text-sm bg-white"
+            >
+              <option value="">— Generic preview —</option>
+              {contacts.map((cc) => (
+                <option key={cc.id} value={cc.id}>
+                  {cc.contact?.name || "Unknown"} {cc.contact?.email ? `(${cc.contact.email})` : ""} {cc.contact?.phone || ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Email message preview */}
+        {campaign.emailBody ? (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-muted">Email Message</h3>
+            <pre className="p-3 bg-white border border-line rounded-lg text-sm whitespace-pre-wrap font-sans text-ink">
+              {getPreviewMessage()}
+            </pre>
+          </div>
+        ) : (
+          <div className="text-sm text-muted italic">No email body configured for this campaign.</div>
+        )}
+
+        {/* WhatsApp template details */}
+        {campaign.whatsappTemplateSid && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-muted">WhatsApp Template</h3>
+            <div className="bg-white border border-line rounded-lg p-3 space-y-2 text-sm">
+              <div>
+                <span className="text-muted">Template SID: </span>
+                <code className="px-1.5 py-0.5 bg-cream rounded text-xs font-mono">
+                  {campaign.whatsappTemplateSid}
+                </code>
+              </div>
+              <div>
+                <span className="text-muted">Variables:</span>
+                <ul className="mt-1 space-y-1">
+                  {getWhatsAppVariables().map((v, i) => (
+                    <li key={i} className="flex gap-2">
+                      <code className="px-1.5 py-0.5 bg-cream rounded text-xs font-mono">{`{{${v.name}}}`}</code>
+                      <span className="text-muted">&rarr;</span>
+                      <span className="text-ink break-all">{v.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Copy button */}
+        {campaign.emailBody && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCopy}
+              className="px-4 py-2 border border-line rounded-lg hover:bg-cream transition-colors text-sm"
+            >
+              {copied ? "Copied!" : "Copy Message"}
+            </button>
+            {copied && (
+              <span className="text-sm text-green-600 font-medium">&check; Copied to clipboard</span>
+            )}
+          </div>
         )}
       </div>
 

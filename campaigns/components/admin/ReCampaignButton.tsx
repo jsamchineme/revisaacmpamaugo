@@ -69,8 +69,7 @@ export default function ReCampaignButton({
         throw new Error(data.error || "Failed to assign contacts");
       }
 
-      // Step 3: Redirect to the new campaign page
-      router.push(`/admin/campaigns/${newCampaignId}`);
+      router.push("/admin/campaigns");
     } catch (err: any) {
       setError(err.message || "Something went wrong");
       setLoading(false);
