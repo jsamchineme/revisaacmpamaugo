@@ -45,7 +45,7 @@ const PRISMA_FIELDS = new Set(["title", "fullname", "phone", "email", "plusOne",
 
 function getFieldValue(reg: Registration, fieldId: string): unknown {
   if (fieldId in reg && PRISMA_FIELDS.has(fieldId)) {
-    return (reg as Record<string, unknown>)[fieldId];
+    return (reg as unknown as Record<string, unknown>)[fieldId];
   }
   if (reg.customData) {
     try {
