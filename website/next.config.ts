@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-
-  // Unique deployment ID for version-skew protection across restarts
-  deploymentId: process.env.DEPLOYMENT_ID,
-
   // Image optimization via Sharp (self-hosted)
   images: {
     formats: ["image/avif", "image/webp"],
