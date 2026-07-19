@@ -3,7 +3,21 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Toast from "@/components/admin/Toast";
+
+interface FormField {
+  id: string;
+  type: string;
+  label: string;
+  placeholder?: string;
+  required: boolean;
+  options?: string[];
+  conditional?: string[];
+}
+
+interface FormConfig {
+  title: string;
+  fields: FormField[];
+}
 
 interface Registration {
   id: string;
@@ -15,6 +29,7 @@ interface Registration {
   plusOne: boolean;
   plusOneGuests: string | null;
   whatsappOptIn: boolean;
+  customData: string | null;
   createdAt: string;
 }
 
@@ -22,6 +37,42 @@ interface EventInfo {
   id: string;
   title: string;
   slug: string;
+  formConfig: string | null;
+}
+
+// All fields stored as named Prisma columns
+const PRISMA_FIELDS = new Set(["title", "fullname", "phone", "email", "plusOne", "plusOneGuests", "whatsappOptIn"]);
+
+function getFieldValue(reg: Registration, fieldId: string): unknown {
+  if (fieldId in reg && PRISMA_FIELDS.has(fieldId)) {
+    return (reg as Record<string, unknown>)[fieldId];
+  }
+  if (reg.customData) {
+    try {
+      const cd = JSON.parse(reg.customData);
+      if (fieldId in cd) return cd[fieldId];
+    } catch {}
+  }
+  return undefined;
+}
+
+function parseGuests(reg: Registration): Record<string, string>[] {
+  // Guests stored as array in plusOneGuests (dynamic guest form)
+  if (reg.plusOneGuests) {
+    try {
+      const arr = JSON.parse(reg.plusOneGuests);
+      if (Array.isArray(arr)) return arr;
+    } catch {}
+  }
+  // Guests stored as individual fields in customData (conditional field form)
+  if (reg.customData) {
+    try {
+      const cd = JSON.parse(reg.customData);
+      const guestKeys = Object.keys(cd).filter((k) => k.startsWith("guest"));
+      if (guestKeys.length > 0) return [cd];
+    } catch {}
+  }
+  return [];
 }
 
 export default function RegistrationsPage() {
@@ -29,76 +80,168 @@ export default function RegistrationsPage() {
   const eventId = params.id as string;
 
   const [event, setEvent] = useState<EventInfo | null>(null);
+  const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [whatsappOnly, setWhatsappOnly] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    async function fetchEvent() {
-      try {
-        const response = await fetch(`/api/admin/events/${eventId}`);
-        if (!response.ok) throw new Error("Failed to fetch event");
-        const data = await response.json();
-        setEvent(data);
-      } catch (err) {
-        setError("Failed to load event details.");
-      }
-    }
-
-    async function fetchRegistrations() {
+    async function load() {
       setLoading(true);
       setError(null);
       try {
-        const url = `/api/admin/events/${eventId}/registrations?whatsappOnly=${whatsappOnly}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch registrations");
-        const data = await response.json();
-        setRegistrations(data);
+        const [evResp, regResp] = await Promise.all([
+          fetch(`/api/admin/events/${eventId}`),
+          fetch(`/api/admin/events/${eventId}/registrations?whatsappOnly=${whatsappOnly}`),
+        ]);
+        if (!evResp.ok) throw new Error("Failed to fetch event");
+        if (!regResp.ok) throw new Error("Failed to fetch registrations");
+
+        const evData: EventInfo = await evResp.json();
+        const regData: Registration[] = await regResp.json();
+
+        setEvent(evData);
+        setRegistrations(regData);
+
+        if (evData.formConfig) {
+          try { setFormConfig(JSON.parse(evData.formConfig)); } catch {}
+        }
       } catch (err) {
-        setError("Failed to load registrations. Please try again.");
+        setError(err instanceof Error ? err.message : "Failed to load data.");
       } finally {
         setLoading(false);
       }
     }
-
-    if (eventId) {
-      fetchEvent();
-      fetchRegistrations();
-    }
+    if (eventId) load();
   }, [eventId, whatsappOnly]);
 
-  function handleExport() {
-    const url = `/api/admin/events/${eventId}/registrations/export?whatsappOnly=${whatsappOnly}`;
-    window.location.href = url;
-  }
+  // Build column list from formConfig (or fall back to defaults)
+  const conditionalIds = new Set(
+    (formConfig?.fields ?? [])
+      .filter((f) => f.type === "checkbox" && f.conditional?.length)
+      .flatMap((f) => f.conditional ?? [])
+  );
 
-  function formatDate(dateStr: string): string {
-    const d = new Date(dateStr);
-    return d.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+  // Columns = non-conditional fields. Checkboxes with conditionals = expandable column.
+  const columns: FormField[] = formConfig
+    ? formConfig.fields.filter((f) => !conditionalIds.has(f.id))
+    : [
+        { id: "title", type: "text", label: "Title", required: false },
+        { id: "fullname", type: "text", label: "Full Name", required: false },
+        { id: "phone", type: "tel", label: "Phone", required: false },
+        { id: "email", type: "email", label: "Email", required: false },
+        { id: "plusOne", type: "checkbox", label: "Guest", required: false },
+        { id: "whatsappOptIn", type: "checkbox", label: "WhatsApp", required: false },
+      ];
+
+  // Conditional field labels keyed by checkboxId
+  const conditionalsByCheckbox = new Map<string, FormField[]>();
+  if (formConfig) {
+    for (const f of formConfig.fields) {
+      if (f.type === "checkbox" && f.conditional?.length) {
+        const condFields = f.conditional
+          .map((cid) => formConfig.fields.find((ff) => ff.id === cid))
+          .filter((ff): ff is FormField => !!ff);
+        conditionalsByCheckbox.set(f.id, condFields);
+      }
+    }
   }
 
   function getTotalCount(): number {
     let count = registrations.length;
     for (const reg of registrations) {
-      if (reg.plusOne && reg.plusOneGuests) {
-        try {
-          const guests = JSON.parse(reg.plusOneGuests);
-          if (Array.isArray(guests)) {
-            count += guests.length;
-          }
-        } catch {
-          // ignore invalid JSON
-        }
-      }
+      count += parseGuests(reg).length > 0 && reg.plusOne ? parseGuests(reg).length : 0;
     }
     return count;
+  }
+
+  function formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleString("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+      hour: "numeric", minute: "2-digit",
+    });
+  }
+
+  function renderCell(reg: Registration, field: FormField) {
+    const val = getFieldValue(reg, field.id);
+
+    if (field.type === "checkbox") {
+      const isChecked = Boolean(val);
+      const condFields = conditionalsByCheckbox.get(field.id);
+
+      if (!isChecked) return <span className="text-muted text-sm">–</span>;
+
+      if (condFields?.length) {
+        const guests = parseGuests(reg);
+        const guestCount = guests.length;
+        const isOpen = expanded.has(reg.id + field.id);
+        return (
+          <button
+            onClick={() =>
+              setExpanded((prev) => {
+                const next = new Set(prev);
+                const key = reg.id + field.id;
+                next.has(key) ? next.delete(key) : next.add(key);
+                return next;
+              })
+            }
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
+          >
+            Yes{guestCount > 0 ? ` (${guestCount})` : ""}
+            <span className="ml-0.5">{isOpen ? "▴" : "▾"}</span>
+          </button>
+        );
+      }
+
+      return (
+        <span className="inline-flex px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+          Yes
+        </span>
+      );
+    }
+
+    if (field.id === "whatsappOptIn") {
+      return val ? (
+        <span className="inline-flex px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Opted In</span>
+      ) : (
+        <span className="text-muted text-sm">–</span>
+      );
+    }
+
+    const str = val == null || val === "" ? "–" : String(val);
+    return <span className="text-sm">{str}</span>;
+  }
+
+  // Guest detail sub-row for an expanded checkbox column
+  function renderGuestRow(reg: Registration, field: FormField, colSpan: number) {
+    const condFields = conditionalsByCheckbox.get(field.id);
+    if (!condFields?.length) return null;
+    const guests = parseGuests(reg);
+    if (!guests.length) return null;
+    const isOpen = expanded.has(reg.id + field.id);
+    if (!isOpen) return null;
+
+    return guests.map((guest, gi) => (
+      <tr key={`${reg.id}-guest-${gi}`} className="bg-blue-50 border-t border-blue-100">
+        <td colSpan={colSpan} className="px-4 py-2">
+          <div className="flex flex-wrap gap-4 text-xs text-blue-900">
+            <span className="font-medium text-blue-700 mr-1">↳ Guest {guests.length > 1 ? gi + 1 : ""}:</span>
+            {condFields.map((cf) => {
+              const v = guest[cf.id] ?? guest[cf.id.replace(/^guest/, "").toLowerCase()];
+              if (!v) return null;
+              return (
+                <span key={cf.id}>
+                  <span className="text-blue-500 font-medium">{cf.label}: </span>
+                  {String(v)}
+                </span>
+              );
+            })}
+          </div>
+        </td>
+      </tr>
+    ));
   }
 
   if (loading) {
@@ -108,6 +251,8 @@ export default function RegistrationsPage() {
       </div>
     );
   }
+
+  const colSpan = columns.length + 1; // +1 for Registered At
 
   return (
     <div className="space-y-6">
@@ -120,145 +265,99 @@ export default function RegistrationsPage() {
             </p>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleExport}
-            disabled={registrations.length === 0}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              registrations.length === 0
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-burgundy text-white hover:bg-burgundy-dark"
-            }`}
-          >
-            Export CSV
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            const url = `/api/admin/events/${eventId}/registrations/export?whatsappOnly=${whatsappOnly}`;
+            window.location.href = url;
+          }}
+          disabled={registrations.length === 0}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            registrations.length === 0
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-burgundy text-white hover:bg-burgundy-dark"
+          }`}
+        >
+          Export CSV
+        </button>
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 flex items-start justify-between">
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="ml-2 text-sm underline flex-shrink-0">
-            Dismiss
-          </button>
+          <button onClick={() => setError(null)} className="ml-2 text-sm underline flex-shrink-0">Dismiss</button>
         </div>
       )}
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => setWhatsappOnly(false)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            !whatsappOnly
-              ? "bg-burgundy text-white"
-              : "bg-cream text-muted hover:bg-cream/80 border border-line"
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setWhatsappOnly(true)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            whatsappOnly
-              ? "bg-green-600 text-white"
-              : "bg-cream text-muted hover:bg-cream/80 border border-line"
-          }`}
-        >
-          WhatsApp Group Only
-        </button>
+        {(["All", "WhatsApp Group Only"] as const).map((label) => {
+          const active = label === "All" ? !whatsappOnly : whatsappOnly;
+          return (
+            <button
+              key={label}
+              onClick={() => setWhatsappOnly(label !== "All")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                active
+                  ? label === "All" ? "bg-burgundy text-white" : "bg-green-600 text-white"
+                  : "bg-cream text-muted hover:bg-cream/80 border border-line"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="bg-white rounded-lg border border-line overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+          <table className="w-full min-w-[700px]">
             <thead className="bg-cream">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  Full Name
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  Phone
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  Email
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  Plus-One
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                  WhatsApp
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-muted">
+                {columns.map((col) => (
+                  <th key={col.id} className="px-4 py-3 text-left text-sm font-medium text-muted whitespace-nowrap">
+                    {col.label}
+                  </th>
+                ))}
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted whitespace-nowrap">
                   Registered At
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {registrations.map((reg) => (
-                <tr key={reg.id} className="hover:bg-cream/50">
-                  <td className="px-4 py-3 text-sm">{reg.title}</td>
-                  <td className="px-4 py-3 text-sm font-medium">{reg.fullname}</td>
-                  <td className="px-4 py-3 text-sm">{reg.phone}</td>
-                  <td className="px-4 py-3 text-sm">{reg.email || "-"}</td>
-                  <td className="px-4 py-3">
-                    {reg.plusOne ? (
-                      <span className="inline-flex px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                        Yes
-                        {reg.plusOneGuests && (
-                          <span className="ml-1">
-                            (
-                            {(() => {
-                              try {
-                                const guests = JSON.parse(reg.plusOneGuests);
-                                return Array.isArray(guests) ? guests.length : 0;
-                              } catch {
-                                return 0;
-                              }
-                            })()}
-                            )
-                          </span>
-                        )}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {reg.whatsappOptIn ? (
-                      <span className="inline-flex px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                        Opted In
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm whitespace-nowrap">{formatDate(reg.createdAt)}</td>
-                </tr>
+                <>
+                  <tr key={reg.id} className="hover:bg-cream/50">
+                    {columns.map((col) => (
+                      <td key={col.id} className="px-4 py-3">
+                        {renderCell(reg, col)}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-sm whitespace-nowrap text-muted">
+                      {formatDate(reg.createdAt)}
+                    </td>
+                  </tr>
+                  {columns
+                    .filter((col) => col.type === "checkbox" && conditionalsByCheckbox.has(col.id))
+                    .map((col) => renderGuestRow(reg, col, colSpan))}
+                </>
               ))}
             </tbody>
           </table>
         </div>
 
-        {!loading && !error && registrations.length === 0 && (
+        {registrations.length === 0 && (
           <div className="px-4 py-12 text-center text-muted">
             <p className="text-lg font-medium mb-1">No registrations yet</p>
-            <p className="text-sm">
-              Registrations will appear here once people RSVP for this event.
-            </p>
+            <p className="text-sm">Registrations will appear here once people RSVP for this event.</p>
           </div>
         )}
       </div>
 
-      <div className="flex justify-start">
-        <Link
-          href="/admin/events"
-          className="px-4 py-2 border border-line rounded-lg hover:bg-cream transition-colors text-sm"
-        >
-          ← Back to Events
-        </Link>
-      </div>
+      <Link
+        href="/admin/events"
+        className="inline-block px-4 py-2 border border-line rounded-lg hover:bg-cream transition-colors text-sm"
+      >
+        ← Back to Events
+      </Link>
     </div>
   );
 }

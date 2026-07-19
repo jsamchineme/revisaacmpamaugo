@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
 
-const connectionString = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
-const filename = connectionString.replace(/^file:/, "");
-const adapter = new PrismaBetterSqlite3({ url: filename });
+const connectionString = process.env.DATABASE_URL;
+const adapter = new PrismaNeon({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 // ─── Rich theological body content ──────────────────────────────────────────

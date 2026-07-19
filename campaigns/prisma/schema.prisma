@@ -3,10 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
-
-// ─── Auth ────────────────────────────────────────────────────────────────────
 
 model User {
   id        String   @id @default(cuid())
@@ -19,25 +17,16 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-enum UserRole {
-  ADMIN
-  EDITOR
-}
-
-// ─── Campaigns ───────────────────────────────────────────────────────────────
-
 model Campaign {
-  id                      String   @id @default(cuid())
-  title                   String
-  whatsappTemplateSid     String?
+  id                        String   @id @default(cuid())
+  title                     String
+  whatsappTemplateSid       String?
   whatsappTemplateVariables String?
-  emailBody               String?
-  link                    String
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  emailBody                 String?
+  link                      String
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 }
-
-// ─── Contacts ────────────────────────────────────────────────────────────────
 
 model Contact {
   id        String   @id @default(cuid())
@@ -48,20 +37,16 @@ model Contact {
   updatedAt DateTime @updatedAt
 }
 
-// ─── CampaignContact (join table) ────────────────────────────────────────────
-
 model CampaignContact {
-  id               String   @id @default(cuid())
-  trackingUuid     String   @unique
-  campaignId       String
-  contactId        String
-  status           String   @default("pending")
-  createdAt        DateTime @default(now())
+  id           String   @id @default(cuid())
+  trackingUuid String   @unique
+  campaignId   String
+  contactId    String
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
 
   @@unique([campaignId, contactId])
 }
-
-// ─── Click Tracking ──────────────────────────────────────────────────────────
 
 model ClickEvent {
   id                String   @id @default(cuid())
@@ -71,19 +56,15 @@ model ClickEvent {
   userAgent         String?
 }
 
-// ─── Send Log ────────────────────────────────────────────────────────────────
-
 model SendLog {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   campaignContactId String
   channel           String
   status            String
   errorMessage      String?
   sentAt            DateTime?
-  createdAt         DateTime @default(now())
+  createdAt         DateTime  @default(now())
 }
-
-// ─── Events ──────────────────────────────────────────────────────────────────
 
 model Event {
   id            String   @id @default(cuid())
@@ -93,29 +74,25 @@ model Event {
   description   String?
   capacity      Int?
   imageUrl      String?
-  designContent String?  // JSON: AI-generated page sections (hero, details, etc.)
-  formConfig    String?  // JSON: RSVP form field configuration
+  designContent String?
+  formConfig    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-// ─── Registrations ───────────────────────────────────────────────────────────
-
 model Registration {
-  id             String   @id @default(cuid())
-  eventId        String
-  title          String
-  fullname       String
-  phone          String
-  email          String?
-  plusOne        Boolean  @default(false)
-  plusOneGuests  String?
-  whatsappOptIn  Boolean  @default(false)
-  customData     String?  // JSON: arbitrary form fields from dynamic RSVP form
-  createdAt      DateTime @default(now())
+  id            String   @id @default(cuid())
+  eventId       String
+  title         String
+  fullname      String
+  phone         String
+  email         String?
+  plusOne       Boolean  @default(false)
+  plusOneGuests String?
+  whatsappOptIn Boolean  @default(false)
+  customData    String?
+  createdAt     DateTime @default(now())
 }
-
-// ─── Rate Limiting ─────────────────────────────────────────────────────────────
 
 model RateLimit {
   id          String   @id @default(cuid())
@@ -125,4 +102,9 @@ model RateLimit {
   windowStart DateTime
 
   @@unique([ip, endpoint])
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
 }
