@@ -1,7 +1,27 @@
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 
 export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const featuredSetting = await prisma.setting.findUnique({
+    where: { key: "featuredEventId" },
+  });
+
+  if (featuredSetting?.value) {
+    const event = await prisma.event.findUnique({
+      where: { id: featuredSetting.value },
+      select: { title: true },
+    });
+
+    if (event?.title) {
+      return { title: event.title };
+    }
+  }
+
+  return { title: "Campaign Manager" };
+}
 
 export default async function RootPage() {
   const [featuredSetting, fallbackSetting] = await Promise.all([

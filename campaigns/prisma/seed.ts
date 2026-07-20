@@ -6,23 +6,32 @@ async function main() {
     where: { email: "admin@campaigns.local" },
   });
 
-  if (existing) {
-    console.log("Admin user already exists, skipping seed.");
-    return;
+  if (!existing) {
+    const hashedPassword = await bcrypt.hash("admin123", 12);
+
+    await prisma.user.create({
+      data: {
+        name: "Admin",
+        email: "admin@campaigns.local",
+        password: hashedPassword,
+        role: "ADMIN",
+      },
+    });
+
+    console.log("Admin user created: admin@campaigns.local / admin123");
+  } else {
+    console.log("Admin user already exists, skipping.");
   }
 
-  const hashedPassword = await bcrypt.hash("admin123", 12);
-
-  await prisma.user.create({
-    data: {
-      name: "Admin",
-      email: "admin@campaigns.local",
-      password: hashedPassword,
-      role: "ADMIN",
-    },
+  await prisma.setting.createMany({
+    data: [
+      { key: "featuredEventId", value: "" },
+      { key: "fallbackUrl", value: "" },
+    ],
+    skipDuplicates: true,
   });
 
-  console.log("Admin user created: admin@campaigns.local / admin123");
+  console.log("Default settings ensured.");
 }
 
 main()

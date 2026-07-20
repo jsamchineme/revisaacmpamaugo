@@ -9,7 +9,6 @@ import {
   Megaphone,
   Users,
   Calendar,
-  ClipboardList,
   Settings,
 } from "./icons";
 
@@ -24,7 +23,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/campaigns", label: "Campaigns", icon: Megaphone },
   { href: "/admin/contacts", label: "Contacts", icon: Users },
   { href: "/admin/events", label: "Events", icon: Calendar },
-  { href: "/admin/registrations", label: "Registrations", icon: ClipboardList },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

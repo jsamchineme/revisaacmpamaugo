@@ -1,8 +1,22 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import EventPageClient from "./EventPageClient";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: EventPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  const event = await prisma.event.findUnique({
+    where: { slug },
+    select: { title: true },
+  });
+
+  return { title: event?.title ?? "Event" };
+}
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
