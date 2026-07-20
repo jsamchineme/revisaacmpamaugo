@@ -3,15 +3,11 @@ interface QuoteProps {
   author: string;
 }
 
-/**
- * Testimonial quote with large opening quote mark — matching .quote from template.
- */
 export function Quote({ text, author }: QuoteProps) {
   return (
-    <div className="bg-white border border-line rounded p-[34px] relative">
-      {/* Opening quote mark */}
+    <div className="bg-white border border-line rounded-[20px] p-[34px] relative">
       <span
-        className="absolute top-[6px] left-[18px] font-serif text-[4.5rem] text-gold opacity-35 leading-none select-none"
+        className="absolute top-[6px] left-[18px] font-serif text-[4.5rem] text-burgundy opacity-[0.28] leading-none select-none"
         aria-hidden="true"
       >
         &ldquo;
@@ -19,7 +15,7 @@ export function Quote({ text, author }: QuoteProps) {
       <p className="font-serif text-[1.18rem] italic text-ink my-[14px] mb-[18px] relative">
         {text}
       </p>
-      <div className="text-[.85rem] font-semibold text-gold-dark tracking-[0.04em]">
+      <div className="text-[.85rem] font-semibold text-burgundy tracking-[0.04em]">
         — {author}
       </div>
     </div>

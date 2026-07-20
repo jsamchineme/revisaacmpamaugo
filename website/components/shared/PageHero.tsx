@@ -9,10 +9,6 @@ interface PageHeroProps {
   children?: ReactNode;
 }
 
-/**
- * Page hero (inner pages) — cream background, centered.
- * Matching .phero from template.
- */
 export function PageHero({
   eyebrow,
   title,
@@ -21,12 +17,12 @@ export function PageHero({
   children,
 }: PageHeroProps) {
   return (
-    <section className={`bg-cream text-center py-[80px] border-b border-line ${className}`}>
-      <div className="wrap">
+    <section className={`bg-soft py-[96px] pb-[80px] border-b border-line ${className}`}>
+      <div className="wrap" style={{ maxWidth: "900px" }}>
         {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-        <h1 className="text-page-h1 mb-[12px]">{title}</h1>
+        <h1 className="text-page-h1 mb-[16px]">{title}</h1>
         {subtitle && (
-          <p className="text-muted max-w-[620px] mx-auto text-[1.1rem]">{subtitle}</p>
+          <p className="text-muted max-w-[640px] text-[1.14rem]">{subtitle}</p>
         )}
         {children}
       </div>

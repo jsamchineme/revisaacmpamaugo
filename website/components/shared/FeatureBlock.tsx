@@ -8,9 +8,6 @@ interface FeatureBlockProps {
   children?: ReactNode;
 }
 
-/**
- * Feature block with icon circle, title, and description — matching .feature from template.
- */
 export function FeatureBlock({
   icon,
   title,
@@ -20,13 +17,13 @@ export function FeatureBlock({
 }: FeatureBlockProps) {
   return (
     <div
-      className={`flex items-center gap-[18px] p-[30px] bg-white border border-line rounded ${className}`}
+      className={`flex items-start gap-[18px] p-[30px] bg-white border border-line rounded-[20px] transition-[320ms] hover:-translate-y-[4px] hover:shadow-card hover:border-accent-soft ${className}`}
     >
-      <div className="flex-none w-[56px] h-[56px] rounded-full bg-cream grid place-items-center text-[1.6rem]">
+      <div className="flex-none w-[54px] h-[54px] rounded-[14px] bg-accent-soft grid place-items-center text-[1.5rem]">
         {icon}
       </div>
       <div>
-        <h3 className="text-[1.35rem] mb-[6px]">{title}</h3>
+        <h3 className="text-[1.25rem] mb-[6px]">{title}</h3>
         <p className="text-muted text-[.93rem]">{description}</p>
         {children}
       </div>

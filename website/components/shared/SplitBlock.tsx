@@ -2,7 +2,6 @@
 
 import { type ReactNode } from "react";
 import { Eyebrow } from "./Eyebrow";
-import { Button } from "./Button";
 
 interface SplitBlockProps {
   imageUrl: string;
@@ -10,21 +9,15 @@ interface SplitBlockProps {
   eyebrow?: string;
   title: string;
   description: string;
-  /** Additional paragraphs */
   extraParagraphs?: string[];
   buttonLabel?: string;
   onButtonClick?: () => void;
   buttonHref?: string;
-  /** Reverse: image on the right */
   reverse?: boolean;
   className?: string;
   children?: ReactNode;
 }
 
-/**
- * Split content block — 2-column grid, image + text.
- * Matching .split from template.
- */
 export function SplitBlock({
   imageUrl,
   imageAlt,
@@ -51,13 +44,19 @@ export function SplitBlock({
       ))}
       {buttonLabel && (buttonHref || onButtonClick) && (
         buttonHref ? (
-          <a href={buttonHref} className="inline-block py-[14px] px-[30px] rounded-full bg-burgundy text-white font-sans font-medium text-[.95rem] tracking-[0.02em] transition-[250ms] hover:bg-burgundy-dark hover:-translate-y-[2px]">
+          <a
+            href={buttonHref}
+            className="inline-flex items-center justify-center py-[15px] px-[30px] rounded-[12px] bg-ink text-paper font-sans font-medium text-[.95rem] tracking-btn transition-[250ms] hover:opacity-90 hover:-translate-y-[2px]"
+          >
             {buttonLabel}
           </a>
         ) : (
-          <Button variant="primary" onClick={onButtonClick}>
+          <button
+            onClick={onButtonClick}
+            className="inline-flex items-center justify-center py-[15px] px-[30px] rounded-[12px] bg-ink text-paper font-sans font-medium text-[.95rem] tracking-btn transition-[250ms] hover:opacity-90 hover:-translate-y-[2px]"
+          >
             {buttonLabel}
-          </Button>
+          </button>
         )
       )}
       {children}
@@ -68,13 +67,13 @@ export function SplitBlock({
     <img
       src={imageUrl}
       alt={imageAlt}
-      className="rounded shadow-card w-full"
+      className="rounded-[24px] shadow-card w-full"
     />
   );
 
   return (
     <div
-      className={`grid grid-cols-2 gap-[60px] items-center max-[900px]:grid-cols-1 max-[900px]:gap-[30px] ${className}`}
+      className={`grid grid-cols-2 gap-[64px] items-center max-[900px]:grid-cols-1 max-[900px]:gap-[36px] ${className}`}
     >
       {reverse ? (
         <>

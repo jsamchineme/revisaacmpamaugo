@@ -9,18 +9,11 @@ interface ButtonBaseProps {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-burgundy text-white hover:bg-burgundy-dark",
-  gold: "bg-gold text-white hover:bg-gold-dark",
-  ghost:
-    "bg-transparent text-ink border-[1.5px] border-line hover:border-gold hover:text-gold-dark",
+  primary: "bg-ink text-paper hover:opacity-90",
+  gold: "bg-burgundy text-white hover:bg-burgundy-dark",
+  ghost: "bg-transparent text-ink border-[1.5px] border-line hover:border-burgundy hover:text-burgundy",
 };
 
-/**
- * Button with 3 variants matching the template:
- * - primary: burgundy bg, white text
- * - gold: gold bg, white text
- * - ghost: transparent with line border, turns gold on hover
- */
 export function Button({
   variant = "primary",
   className = "",
@@ -30,7 +23,7 @@ export function Button({
   ButtonHTMLAttributes<HTMLButtonElement> &
   AnchorHTMLAttributes<HTMLAnchorElement>) {
   const base =
-    "inline-block py-[14px] px-[30px] rounded-full font-sans font-medium text-[.95rem] tracking-btn cursor-pointer border-none transition-[250ms] text-center hover:-translate-y-[2px]";
+    "inline-flex items-center justify-center gap-[8px] py-[15px] px-[30px] rounded-[12px] font-sans font-medium text-[.95rem] tracking-btn cursor-pointer border-none transition-[250ms] text-center hover:-translate-y-[2px]";
 
   return (
     <button
@@ -42,7 +35,7 @@ export function Button({
   );
 }
 
-/** Ghost button variant for use on dark backgrounds (white text, semi-transparent border) */
+/** Ghost button for dark backgrounds */
 export function GhostButtonLight({
   className = "",
   children,
@@ -50,7 +43,7 @@ export function GhostButtonLight({
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`inline-block py-[14px] px-[30px] rounded-full font-sans font-medium text-[.95rem] tracking-btn cursor-pointer transition-[250ms] text-center hover:-translate-y-[2px] bg-transparent text-white border-[1.5px] border-white/50 hover:border-gold hover:text-gold ${className}`}
+      className={`inline-flex items-center justify-center gap-[8px] py-[15px] px-[30px] rounded-[12px] font-sans font-medium text-[.95rem] tracking-btn cursor-pointer transition-[250ms] text-center hover:-translate-y-[2px] bg-transparent text-white border-[1.5px] border-white/50 hover:border-white hover:bg-white/10 ${className}`}
       {...props}
     >
       {children}

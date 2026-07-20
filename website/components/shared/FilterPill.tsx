@@ -22,8 +22,8 @@ export function FilterPill({
       onClick={onClick}
       className={`py-[9px] px-[22px] rounded-full border-[1.5px] font-sans text-[.85rem] font-medium cursor-pointer transition-[200ms] ${
         active
-          ? "bg-burgundy text-white border-burgundy"
-          : "bg-transparent text-muted border-line hover:border-gold"
+          ? "bg-ink text-paper border-ink"
+          : "bg-transparent text-muted border-line hover:border-burgundy hover:text-ink"
       } ${className}`}
     >
       {label}
