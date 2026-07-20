@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  generateBuildId: async () => null,
+  turbopack: {
+    root: "/Users/samuelosuh/codes/revisaacmpamaugo/campaigns",
+  },
   async headers() {
     const headers = [
       {

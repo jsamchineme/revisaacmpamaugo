@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { SessionProvider, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Megaphone,
@@ -79,13 +79,13 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Don't render shell on login page
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
+  // Don't render shell on login or verify-2fa pages
+  if (pathname === "/admin/login" || pathname === "/admin/verify-2fa") {
+    return <SessionProvider>{children}</SessionProvider>;
   }
 
   if (!user) {
-    return <>{children}</>;
+    return <SessionProvider>{children}</SessionProvider>;
   }
 
   async function handleLogout() {
@@ -94,6 +94,7 @@ export default function AdminShell({ children, user }: AdminShellProps) {
   }
 
   return (
+    <SessionProvider>
     <div className="min-h-screen bg-paper flex">
       {/* ── Sidebar ────────────────────────────── */}
       <aside
@@ -243,5 +244,6 @@ export default function AdminShell({ children, user }: AdminShellProps) {
         <main className="flex-1 p-4 lg:p-8">{children}</main>
       </div>
     </div>
+    </SessionProvider>
   );
 }

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "env -u __NEXT_PRIVATE_STANDALONE_CONFIG -u NEXT_DEPLOYMENT_ID -u __NEXT_OPTIMIZE_FONTS -u __NEXT_PRIVATE_RUNTIME_TYPE next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint"
@@ -23,19 +23,23 @@
     "next-auth": "^5.0.0-beta.31",
     "nodemailer": "^7.0.13",
     "prisma": "^7.8.0",
+    "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.81.0",
+    "speakeasy": "^2.0.0",
     "twilio": "^6.0.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^20",
+    "@types/node": "20.19.43",
     "@types/nodemailer": "^8.0.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/speakeasy": "^2.0.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",

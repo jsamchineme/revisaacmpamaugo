@@ -69,8 +69,8 @@ export default function AdminShell({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Don't render shell on login page
-  if (pathname === "/admin/login") {
+  const isAuthPage = pathname === "/admin/login" || pathname === "/admin/verify-2fa";
+  if (isAuthPage) {
     return <>{children}</>;
   }
 

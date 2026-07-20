@@ -2,4 +2,5 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 
 export const { auth } = NextAuth(authConfig);
-export { auth as middleware };
+export { auth as proxy };
+

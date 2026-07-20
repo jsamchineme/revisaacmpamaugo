@@ -24,10 +24,32 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = !!auth?.user;
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
       const isLoginPage = nextUrl.pathname === "/admin/login";
+      const isVerify2faPage = nextUrl.pathname === "/admin/verify-2fa";
+      const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+      const isVerify2faApi = nextUrl.pathname === "/api/auth/verify-2fa";
+
+      const twoFactorRequired = auth?.user?.twoFactorRequired ?? false;
+      const twoFactorVerified = auth?.user?.twoFactorVerified ?? false;
+      const needs2fa = isLoggedIn && twoFactorRequired && !twoFactorVerified;
 
       if (isLoginPage) {
-        if (isLoggedIn) return Response.redirect(new URL("/admin", nextUrl));
+        if (isLoggedIn && !needs2fa) {
+          return Response.redirect(new URL("/admin", nextUrl));
+        }
         return true;
+      }
+
+      if (isVerify2faPage || isVerify2faApi) {
+        return true;
+      }
+
+      if (needs2fa) {
+        if (isApiAuthRoute) {
+          return true;
+        }
+        if (isAdminRoute) {
+          return Response.redirect(new URL("/admin/verify-2fa", nextUrl));
+        }
       }
 
       if (isAdminRoute) {
