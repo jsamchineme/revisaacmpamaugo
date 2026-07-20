@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import AdminShell from "@/components/admin/AdminShell";
+import AdminProviders from "./providers";
 
 export default async function AdminLayout({
   children,
@@ -16,5 +17,9 @@ export default async function AdminLayout({
       }
     : null;
 
-  return <AdminShell user={user}>{children}</AdminShell>;
+  return (
+    <AdminProviders>
+      <AdminShell user={user}>{children}</AdminShell>
+    </AdminProviders>
+  );
 }

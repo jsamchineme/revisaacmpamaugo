@@ -16,6 +16,7 @@ export async function GET() {
 
   const otpauthURL = speakeasy.otpauthURL({
     secret: secret.base32,
+    encoding: "base32",
     label: session.user.email,
     issuer: "Rev. Isaac Website",
   });
