@@ -9,17 +9,17 @@ const SEO_META: Record<string, { title: string; description: string }> = {
   about: {
     title: "Our Story | Rev. Isaac Mpamaugo & Rev. Mrs. Edith Mpamaugo",
     description:
-      "The life and shared ministry of Rev. Isaac Mpamaugo and his wife Rev. Mrs. Edith Mpamaugo.",
+      "The life and shared ministry of Rev. Isaac Mpamaugo and his co-ministry partner Rev. Mrs. Edith Mpamaugo.",
   },
   ministry: {
-    title: "Ministry & Invitations | Rev. Isaac Mpamaugo",
+    title: "Ministry & Invitations | Rev. Isaac & Rev. Mrs. Edith Mpamaugo",
     description:
-      "Preaching, Bible teaching, prayer, and marriage & family ministry. Invite Rev. Isaac to minister.",
+      "Preaching, Bible teaching, prayer, and marriage & family ministry. Invite Rev. Isaac or Rev. Mrs. Edith to minister.",
   },
   contact: {
-    title: "Contact | Reverend Isaac Mpamaugo",
+    title: "Contact | Rev. Isaac & Rev. Mrs. Edith Mpamaugo",
     description:
-      "Request prayer, ask a question, or invite Reverend Isaac to minister.",
+      "Request prayer, ask a question, or invite Rev. Isaac or Rev. Mrs. Edith to minister.",
   },
   sermons: {
     title: "Sermons & Teachings | Rev. Isaac Mpamaugo",

@@ -37,7 +37,7 @@ export function Header() {
           <div className="font-display font-semibold text-[1.12rem] leading-[1.05] tracking-[-0.02em]">
             Rev. Isaac Mpamaugo
             <small className="block font-sans text-[.6rem] tracking-[0.18em] uppercase text-burgundy font-semibold mt-[2px]">
-              Ministry of the Word
+              & Rev. Mrs. Edith Mpamaugo
             </small>
           </div>
         </a>

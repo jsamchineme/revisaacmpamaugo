@@ -34,7 +34,7 @@ export function HeroSection({
         {/* Text column */}
         <div className="pb-[80px] max-[900px]:pb-0 max-[900px]:text-center">
           <p className="font-display text-[.78rem] font-semibold tracking-[0.18em] uppercase text-burgundy mb-[20px]">
-            Ministry of the Word
+            ● Ministry of the Word
           </p>
           <h1
             className="text-hero-h1 mb-[22px]"

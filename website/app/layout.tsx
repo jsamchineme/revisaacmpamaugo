@@ -25,9 +25,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Rev. Isaac Mpamaugo | Sermons, Teachings & Ministry",
+  title: "Rev. Isaac & Rev. Mrs. Edith Mpamaugo | Sermons, Teachings & Ministries",
   description:
-    "A retired Reverend sharing a lifetime of sermons and Bible teaching. Listen, be encouraged, or get in touch.",
+    "Rev. Isaac and Rev. Mrs. Edith Mpamaugo — a lifetime of Gospel ministry, sermons, Bible teaching, missions, and community outreach. Listen, be encouraged, or get in touch.",
 };
 
 export default function RootLayout({

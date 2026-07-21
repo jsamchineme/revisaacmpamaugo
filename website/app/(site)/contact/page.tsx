@@ -48,7 +48,7 @@ export default function ContactPage() {
         <PageHero
           eyebrow="Connect"
           title="Get in Touch"
-          subtitle="Whether you'd like prayer, an encouraging word, or to invite Rev. Isaac to minister, we'd love to hear from you."
+          subtitle="Whether you'd like prayer, an encouraging word, or to invite Rev. Isaac or Rev. Mrs. Edith to minister, we'd love to hear from you."
         />
 
         <section className="section-padding">
