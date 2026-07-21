@@ -4,14 +4,14 @@ import { prisma } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 const guestSchema = z.object({
-  title: z.enum(["Mr", "Mrs", "Ms", "Dr"]),
+  title: z.string().optional().or(z.literal("")),
   fullname: z.string().min(1, "Guest full name is required"),
   phone: z.string().regex(/^\+[1-9][0-9]{7,14}$/, "Phone must be in E.164 format (e.g., +2348012345678)"),
   email: z.string().email("Valid email required").optional().or(z.literal("")),
 });
 
 const registrationSchema = z.object({
-  title: z.enum(["Mr", "Mrs", "Ms", "Dr"]).optional().or(z.literal("")),
+  title: z.string().optional().or(z.literal("")),
   fullname: z.string().min(1, "Full name is required"),
   phone: z.string().regex(/^\+[1-9][0-9]{7,14}$/, "Phone must be in E.164 format (e.g., +2348012345678)"),
   email: z.string().email("Valid email required").optional().or(z.literal("")),
@@ -65,19 +65,6 @@ export async function POST(
       );
     }
 
-    if (event.capacity !== null && event.capacity !== undefined) {
-      const registrationCount = await prisma.registration.count({
-        where: { eventId: event.id },
-      });
-
-      if (registrationCount >= event.capacity) {
-        return NextResponse.json(
-          { error: "Registration closed — event is full" },
-          { status: 400 }
-        );
-      }
-    }
-
     const body = await request.json();
     const parsed = registrationSchema.safeParse(body);
 
@@ -86,6 +73,35 @@ export async function POST(
         { error: "Validation failed", details: parsed.error.flatten() },
         { status: 400 }
       );
+    }
+
+    if (event.capacity !== null && event.capacity !== undefined) {
+      const existingRegistrations = await prisma.registration.findMany({
+        where: { eventId: event.id },
+        select: { plusOneGuests: true },
+      });
+
+      const existingAttendees = existingRegistrations.reduce((sum, r) => {
+        let guestCount = 0;
+        if (r.plusOneGuests) {
+          try {
+            const guests = JSON.parse(r.plusOneGuests);
+            if (Array.isArray(guests)) guestCount = guests.length;
+          } catch (err) {
+            console.error("Failed to parse plusOneGuests for capacity check:", err);
+          }
+        }
+        return sum + 1 + guestCount;
+      }, 0);
+
+      const newAttendees = 1 + (parsed.data.plusOneGuests?.length ?? 0);
+
+      if (existingAttendees + newAttendees > event.capacity) {
+        return NextResponse.json(
+          { error: "Registration closed — not enough spots remaining" },
+          { status: 400 }
+        );
+      }
     }
 
     const { title, fullname, phone, email, plusOne, plusOneGuests, whatsappOptIn, ...rest } = parsed.data;

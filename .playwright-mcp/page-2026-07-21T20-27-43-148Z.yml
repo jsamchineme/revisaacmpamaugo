@@ -1,0 +1,178 @@
+- generic [active] [ref=e1]:
+  - main:
+    - iframe [ref=e2]:
+      - generic [ref=f1e2]:
+        - generic [ref=f1e7]:
+          - generic [ref=f1e8]: SAVE THE DATE
+          - generic [ref=f1e9]: CELEBRATING
+          - heading "Rev. Isaac & Rev. Edith Mpamaugo" [level=1] [ref=f1e10]: Rev. Isaac& Rev. EdithMpamaugo
+          - generic [ref=f1e12]:
+            - paragraph [ref=f1e13]:
+              - text: His
+              - strong [ref=f1e14]: 80th
+              - text: "& Her"
+              - strong [ref=f1e15]: 70th
+              - text: Birthdays
+            - paragraph [ref=f1e16]:
+              - text: Their
+              - strong [ref=f1e17]: 48th
+              - text: Wedding Anniversary
+          - generic [ref=f1e18]:
+            - paragraph [ref=f1e19]: Saturday, December 26, 2026
+            - paragraph [ref=f1e20]: LAGOS, NIGERIA
+        - generic [ref=f1e21]:
+          - generic [ref=f1e22]: THE COUNTDOWN HAS BEGUN
+          - generic [ref=f1e23]:
+            - generic [ref=f1e24]:
+              - generic [ref=f1e25]: "157"
+              - generic [ref=f1e26]: Days
+            - generic [ref=f1e27]:
+              - generic [ref=f1e28]: "13"
+              - generic [ref=f1e29]: Hours
+            - generic [ref=f1e30]:
+              - generic [ref=f1e31]: "32"
+              - generic [ref=f1e32]: Minutes
+            - generic [ref=f1e33]:
+              - generic [ref=f1e34]: "16"
+              - generic [ref=f1e35]: Seconds
+        - generic [ref=f1e37]:
+          - generic [ref=f1e38]: CELEBRATE WITH US
+          - generic [ref=f1e39]:
+            - generic [ref=f1e40]:
+              - generic [ref=f1e41]: THE DATE
+              - paragraph [ref=f1e42]: Saturday, December 26, 2026
+            - generic [ref=f1e44]:
+              - generic [ref=f1e45]: THE TIME
+              - paragraph [ref=f1e46]: Promptly at 11:00 AM
+            - generic [ref=f1e48]:
+              - generic [ref=f1e49]: THE PLACE
+              - paragraph [ref=f1e50]: Lagos, Nigeria
+        - generic [ref=f1e51]:
+          - heading "RSVP" [level=2] [ref=f1e52]
+          - generic [ref=f1e54]:
+            - generic [ref=f1e55]:
+              - generic [ref=f1e56]: Title *
+              - combobox "Title *" [ref=f1e57]:
+                - option "Mr" [selected]
+                - option "Mrs"
+                - option "Ms"
+                - option "Dr"
+            - generic [ref=f1e58]:
+              - generic [ref=f1e59]: Full Name *
+              - textbox "Full Name *" [ref=f1e60]:
+                - /placeholder: John Doe
+            - generic [ref=f1e61]:
+              - generic [ref=f1e62]: Phone *
+              - textbox "Phone *" [ref=f1e63]:
+                - /placeholder: "+2348012345678"
+            - generic [ref=f1e64]:
+              - generic [ref=f1e65]: Email
+              - textbox "Email" [ref=f1e66]:
+                - /placeholder: john@example.com
+            - generic [ref=f1e67]:
+              - generic [ref=f1e68] [cursor=pointer]:
+                - checkbox "I'm coming with guests" [checked] [ref=f1e69]
+                - generic [ref=f1e70]: I'm coming with guests
+              - generic [ref=f1e71]:
+                - generic [ref=f1e72]:
+                  - generic [ref=f1e73]: Number of guests
+                  - spinbutton [ref=f1e74]: "2"
+                - generic [ref=f1e76]:
+                  - generic [ref=f1e77]:
+                    - strong [ref=f1e78]: Guest 1
+                    - generic [ref=f1e79]:
+                      - generic [ref=f1e80]:
+                        - generic [ref=f1e81]: Title *
+                        - textbox "Mr, Mrs, Ms, Dr" [ref=f1e82]
+                      - generic [ref=f1e83]:
+                        - generic [ref=f1e84]: Full Name *
+                        - textbox "Jane Doe" [ref=f1e85]
+                      - generic [ref=f1e86]:
+                        - generic [ref=f1e87]: Phone *
+                        - textbox "+2348098765432" [ref=f1e88]
+                      - generic [ref=f1e89]:
+                        - generic [ref=f1e90]: Email
+                        - textbox "jane@example.com" [ref=f1e91]
+                  - generic [ref=f1e92]:
+                    - strong [ref=f1e93]: Guest 2
+                    - generic [ref=f1e94]:
+                      - generic [ref=f1e95]:
+                        - generic [ref=f1e96]: Title *
+                        - textbox "Mr, Mrs, Ms, Dr" [ref=f1e97]
+                      - generic [ref=f1e98]:
+                        - generic [ref=f1e99]: Full Name *
+                        - textbox "Jane Doe" [ref=f1e100]
+                      - generic [ref=f1e101]:
+                        - generic [ref=f1e102]: Phone *
+                        - textbox "+2348098765432" [ref=f1e103]
+                      - generic [ref=f1e104]:
+                        - generic [ref=f1e105]: Email
+                        - textbox "jane@example.com" [ref=f1e106]
+            - generic [ref=f1e108] [cursor=pointer]:
+              - checkbox "I agree to be added to the event's WhatsApp group" [ref=f1e109]
+              - generic [ref=f1e110]: I agree to be added to the event's WhatsApp group
+            - button "Register" [ref=f1e111] [cursor=pointer]
+          - paragraph [ref=f1e112]:
+            - text: Questions? Call Dr. Deborah Odunze (
+            - link "+234 913 924 3949" [ref=f1e113] [cursor=pointer]:
+              - /url: tel:+2349139243949
+            - text: ) or Olabisi Aweda (
+            - link "+234 902 066 4053" [ref=f1e114] [cursor=pointer]:
+              - /url: tel:+2349020664053
+            - text: ).
+        - generic [ref=f1e116]:
+          - generic [ref=f1e117]: THE PROGRAM
+          - heading "Order of Events" [level=2] [ref=f1e118]
+          - generic [ref=f1e119]:
+            - generic [ref=f1e120]: 11:00 AM
+            - generic [ref=f1e121]:
+              - generic [ref=f1e122]: Thanksgiving Service
+              - generic [ref=f1e123]: Opening worship & prayer of gratitude
+          - generic [ref=f1e124]:
+            - generic [ref=f1e125]: 1:00 PM
+            - generic [ref=f1e126]:
+              - generic [ref=f1e127]: Reception & Luncheon
+              - generic [ref=f1e128]: Seated dinner with family & friends
+          - generic [ref=f1e129]:
+            - generic [ref=f1e130]: 2:30 PM
+            - generic [ref=f1e131]:
+              - generic [ref=f1e132]: Tributes & Toasts
+              - generic [ref=f1e133]: Words of honour from family & loved ones
+          - generic [ref=f1e134]:
+            - generic [ref=f1e135]: 4:00 PM
+            - generic [ref=f1e136]:
+              - generic [ref=f1e137]: Cake Cutting & Dancing
+              - generic [ref=f1e138]: Celebration, music & fellowship
+        - generic [ref=f1e140]:
+          - generic [ref=f1e141]: ✦
+          - generic [ref=f1e145]: YOU ARE INVITED
+          - heading "A Thanksgiving Service" [level=2] [ref=f1e146]
+          - paragraph [ref=f1e147]: All are welcome — come and give thanks with us.
+          - generic [ref=f1e148]:
+            - generic [ref=f1e149]:
+              - generic [ref=f1e150]: THE DATE
+              - paragraph [ref=f1e151]: Sunday, 27 December 2026
+            - generic [ref=f1e153]:
+              - generic [ref=f1e154]: THE TIME
+              - paragraph [ref=f1e155]: 11:00 AM
+            - generic [ref=f1e157]:
+              - generic [ref=f1e158]: LOCATION
+              - paragraph [ref=f1e159]: 2/4 Bank Shonibare StreetOjodu Berger, Lagos
+          - paragraph [ref=f1e161]:
+            - text: Join us the morning after the celebration for a
+            - strong [ref=f1e162]: Sunday Church Service
+            - text: — a moment to pause, reflect, and offer thanks to God for
+            - strong [ref=f1e163]: 50 years of faithful ministry
+            - text: and the gift of family.
+            - emphasis [ref=f1e164]: Open to all.
+            - text: 2/4 Bank Shonibare Street, Ojodu Berger, Lagos, Nigeria
+        - contentinfo [ref=f1e165]:
+          - generic [ref=f1e166]:
+            - generic [ref=f1e167]: ✦ ✦ ✦
+            - paragraph [ref=f1e168]: With love & gratitude,
+            - paragraph [ref=f1e169]: The Mpamaugo Family
+            - paragraph [ref=f1e171]: DECEMBER 26, 2026 · LAGOS, NIGERIA
+            - paragraph [ref=f1e172]:
+              - emphasis [ref=f1e173]: To God be all the glory.
+  - button "Open Next.js Dev Tools" [ref=e8] [cursor=pointer]
+  - alert [ref=e12]

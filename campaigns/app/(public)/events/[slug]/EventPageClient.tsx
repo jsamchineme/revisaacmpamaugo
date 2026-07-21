@@ -2,19 +2,7 @@
 
 import { useState } from "react";
 import DynamicRSVPForm from "./DynamicRSVPForm";
-
-interface FormConfig {
-  title: string;
-  fields: Array<{
-    id: string;
-    type: string;
-    label: string;
-    placeholder?: string;
-    required: boolean;
-    options?: string[];
-    conditional?: string[];
-  }>;
-}
+import { FormConfig } from "@/lib/form-config-types";
 
 interface EventData {
   id: string;
@@ -32,27 +20,29 @@ interface EventData {
 
 interface EventPageClientProps {
   event: EventData;
-  registrationCount: number;
+  attendeeCount: number;
   isPast: boolean;
   isFull: boolean;
+  numberOfInvitees?: number;
 }
 
 export default function EventPageClient({
   event,
-  registrationCount,
+  attendeeCount,
   isPast,
   isFull,
+  numberOfInvitees = 0,
 }: EventPageClientProps) {
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
   const capacityText =
     event.capacity !== null && event.capacity !== undefined
-      ? `${registrationCount} / ${event.capacity} registered`
-      : `${registrationCount} registered`;
+      ? `${attendeeCount} / ${event.capacity} registered`
+      : `${attendeeCount} registered`;
 
   const spotsLeft =
     event.capacity !== null && event.capacity !== undefined
-      ? Math.max(0, event.capacity - registrationCount)
+      ? Math.max(0, event.capacity - attendeeCount)
       : null;
 
   const isRegistrationOpen = !isPast && !isFull;
@@ -81,6 +71,7 @@ export default function EventPageClient({
       eventSlug={event.slug}
       formConfig={formConfig}
       onSuccess={() => setRsvpSuccess(true)}
+      queryMaxGuests={numberOfInvitees}
     />
   ) : (
     <div className="bg-cream border border-line rounded-lg p-6 text-center text-muted">
@@ -132,9 +123,10 @@ export default function EventPageClient({
   // If there's a custom HTML design, serve it via iframe so scripts execute
   // and the RSVP form is injected server-side by the render route
   if (event.designContent) {
+    const renderQuery = numberOfInvitees > 0 ? `?noi=${numberOfInvitees}` : "";
     return (
       <iframe
-        src={`/api/events/${event.slug}/render`}
+        src={`/api/events/${event.slug}/render${renderQuery}`}
         title={event.title}
         style={{
           display: "block",

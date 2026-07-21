@@ -4,23 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Toast from "@/components/admin/Toast";
-
-type FieldType = "text" | "email" | "tel" | "select" | "checkbox" | "textarea" | "radio" | "number";
-
-interface FormField {
-  id: string;
-  type: FieldType;
-  label: string;
-  placeholder?: string;
-  required: boolean;
-  options?: string[];
-  conditional?: string[];
-}
-
-interface FormConfig {
-  title: string;
-  fields: FormField[];
-}
+import { FieldType, FormField, FormConfig } from "@/lib/form-config-types";
 
 interface Event {
   id: string;
@@ -61,30 +45,55 @@ const DEFAULT_FIELDS: FormField[] = [
   {
     id: "plusOne",
     type: "checkbox",
-    label: "I'm coming with a guest",
+    label: "I'm coming with guests",
     required: false,
-    conditional: ["guestTitle", "guestFullname", "guestPhone"],
+    conditional: ["guestCount", "guests"],
   },
   {
-    id: "guestTitle",
-    type: "select",
-    label: "Guest Title",
-    required: true,
-    options: ["Mr", "Mrs", "Ms", "Dr"],
+    id: "guestCount",
+    type: "number",
+    label: "Number of guests",
+    required: false,
+    max: 5,
+    maxFromQuery: "noi",
   },
   {
-    id: "guestFullname",
-    type: "text",
-    label: "Guest Full Name",
-    placeholder: "Jane Doe",
-    required: true,
-  },
-  {
-    id: "guestPhone",
-    type: "tel",
-    label: "Guest Phone",
-    placeholder: "+2348098765432",
-    required: true,
+    id: "guests",
+    type: "guestGroup",
+    label: "Guests",
+    required: false,
+    countField: "guestCount",
+    max: 5,
+    subFields: [
+      {
+        id: "title",
+        type: "text",
+        label: "Title",
+        placeholder: "Mr, Mrs, Ms, Dr",
+        required: true,
+      },
+      {
+        id: "fullname",
+        type: "text",
+        label: "Full Name",
+        placeholder: "Jane Doe",
+        required: true,
+      },
+      {
+        id: "phone",
+        type: "tel",
+        label: "Phone",
+        placeholder: "+2348098765432",
+        required: true,
+      },
+      {
+        id: "email",
+        type: "email",
+        label: "Email",
+        placeholder: "jane@example.com",
+        required: false,
+      },
+    ],
   },
   {
     id: "whatsappOptIn",
@@ -103,6 +112,7 @@ const FIELD_TYPE_LABELS: Record<FieldType, string> = {
   textarea: "Textarea",
   radio: "Radio",
   number: "Number",
+  guestGroup: "Guest Group",
 };
 
 export default function FormBuilderPage() {
@@ -396,6 +406,158 @@ export default function FormBuilderPage() {
                       className="w-full mt-1 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
                     />
                   </div>
+
+                  {field.type === "number" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium">Maximum value</label>
+                        <input
+                          type="number"
+                          value={field.max ?? ""}
+                          onChange={(e) =>
+                            updateField(field.id, {
+                              max: e.target.value ? parseInt(e.target.value, 10) : undefined,
+                            })
+                          }
+                          placeholder="5"
+                          className="w-full mt-1 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Max from query param</label>
+                        <p className="text-xs text-muted mb-1">e.g. noi</p>
+                        <input
+                          type="text"
+                          value={field.maxFromQuery || ""}
+                          onChange={(e) =>
+                            updateField(field.id, {
+                              maxFromQuery: e.target.value || undefined,
+                            })
+                          }
+                          placeholder="noi"
+                          className="w-full mt-1 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {field.type === "guestGroup" && (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Count field</label>
+                        <p className="text-xs text-muted mb-1">Number field that controls how many guests to render</p>
+                        <select
+                          value={field.countField || ""}
+                          onChange={(e) =>
+                            updateField(field.id, {
+                              countField: e.target.value || undefined,
+                            })
+                          }
+                          className="w-full mt-1 px-3 py-2 border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-white"
+                        >
+                          <option value="">Select a number field</option>
+                          {formConfig.fields
+                            .filter((f) => f.type === "number" && f.id !== field.id)
+                            .map((f) => (
+                              <option key={f.id} value={f.id}>{f.label} ({f.id})</option>
+                            ))}
+                        </select>
+                      </div>
+
+                      {field.subFields && field.subFields.length > 0 && (
+                        <div>
+                          <label className="text-sm font-medium">Guest fields</label>
+                          <div className="mt-2 space-y-3">
+                            {field.subFields.map((sub, idx) => (
+                              <div key={sub.id} className="grid grid-cols-1 sm:grid-cols-6 gap-3 items-end p-3 bg-white rounded-lg border border-line">
+                                <div className="sm:col-span-2">
+                                  <label className="text-xs text-muted">Label</label>
+                                  <input
+                                    type="text"
+                                    value={sub.label}
+                                    onChange={(e) => {
+                                      const next = [...(field.subFields ?? [])];
+                                      next[idx] = { ...sub, label: e.target.value };
+                                      updateField(field.id, { subFields: next });
+                                    }}
+                                    className="w-full mt-1 px-2 py-1.5 border border-line rounded text-sm"
+                                  />
+                                </div>
+                                <div className="sm:col-span-2">
+                                  <label className="text-xs text-muted">Type</label>
+                                  <select
+                                    value={sub.type}
+                                    onChange={(e) => {
+                                      const next = [...(field.subFields ?? [])];
+                                      const newType = e.target.value as FieldType;
+                                      next[idx] = { ...sub, type: newType };
+                                      if (newType === "select" && !sub.options) {
+                                        next[idx].options = ["Mr", "Mrs", "Ms", "Dr"];
+                                      }
+                                      updateField(field.id, { subFields: next });
+                                    }}
+                                    className="w-full mt-1 px-2 py-1.5 border border-line rounded text-sm bg-white"
+                                  >
+                                    {Object.entries(FIELD_TYPE_LABELS).map(([value, label]) => (
+                                      <option key={value} value={value}>{label}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div className="sm:col-span-2">
+                                  <label className="text-xs text-muted">Placeholder</label>
+                                  <input
+                                    type="text"
+                                    value={sub.placeholder || ""}
+                                    onChange={(e) => {
+                                      const next = [...(field.subFields ?? [])];
+                                      next[idx] = {
+                                        ...sub,
+                                        placeholder: e.target.value || undefined,
+                                      };
+                                      updateField(field.id, { subFields: next });
+                                    }}
+                                    className="w-full mt-1 px-2 py-1.5 border border-line rounded text-sm"
+                                  />
+                                </div>
+                                {sub.type === "select" && (
+                                  <div className="sm:col-span-4">
+                                    <label className="text-xs text-muted">Options (comma-separated)</label>
+                                    <input
+                                      type="text"
+                                      value={sub.options?.join(", ") || ""}
+                                      onChange={(e) => {
+                                        const next = [...(field.subFields ?? [])];
+                                        next[idx] = {
+                                          ...sub,
+                                          options: e.target.value.split(",").map((o) => o.trim()).filter(Boolean),
+                                        };
+                                        updateField(field.id, { subFields: next });
+                                      }}
+                                      placeholder="Mr, Mrs, Ms, Dr"
+                                      className="w-full mt-1 px-2 py-1.5 border border-line rounded text-sm"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2 sm:col-span-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={sub.required}
+                                    onChange={(e) => {
+                                      const next = [...(field.subFields ?? [])];
+                                      next[idx] = { ...sub, required: e.target.checked };
+                                      updateField(field.id, { subFields: next });
+                                    }}
+                                    className="w-4 h-4 rounded border-line"
+                                  />
+                                  <label className="text-sm">Required</label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -493,6 +655,17 @@ export default function FormBuilderPage() {
                     <input type="checkbox" disabled className="w-4 h-4 rounded border-line" />
                     <span className="text-sm text-ink">{field.label}</span>
                   </label>
+                ) : field.type === "number" ? (
+                  <input
+                    type="number"
+                    disabled
+                    placeholder={field.placeholder}
+                    className="w-full px-3 py-2 border border-line rounded-lg text-sm bg-cream/50"
+                  />
+                ) : field.type === "guestGroup" ? (
+                  <div className="space-y-2 p-3 border border-line rounded-lg bg-cream/50">
+                    <p className="text-xs text-muted">{field.label} ({field.subFields?.length ?? 0} fields per guest)</p>
+                  </div>
                 ) : field.type === "radio" ? (
                   <div className="space-y-2">
                     {field.options?.map((opt) => (

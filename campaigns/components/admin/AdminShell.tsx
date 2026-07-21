@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SessionProvider, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
@@ -29,7 +29,22 @@ const NAV_ITEMS: NavItem[] = [
 /* ── Breadcrumb ───────────────────────────────────── */
 
 function Breadcrumb({ pathname }: { pathname: string }) {
+  const [eventSlug, setEventSlug] = useState<string | null>(null);
+
   const segments = pathname.split("/").filter(Boolean);
+  // Detect /admin/events/[id]/... pattern
+  const eventIdIndex = segments[0] === "admin" && segments[1] === "events" ? 2 : -1;
+  const eventId = eventIdIndex >= 0 ? segments[eventIdIndex] : null;
+
+  useEffect(() => {
+    setEventSlug(null);
+    if (!eventId) return;
+    fetch(`/api/admin/events/${eventId}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.slug) setEventSlug(data.slug); })
+      .catch(() => {});
+  }, [eventId]);
+
   if (segments.length <= 1) return <span>Dashboard</span>;
 
   const crumbs = segments.slice(1); // skip "admin"
@@ -45,17 +60,20 @@ function Breadcrumb({ pathname }: { pathname: string }) {
       {crumbs.map((crumb, i) => {
         const href = `/admin/${crumbs.slice(0, i + 1).join("/")}`;
         const isLast = i === crumbs.length - 1;
+        // Replace the event ID segment with its slug
+        const isEventId = eventId && crumb === eventId;
+        const label = isEventId ? (eventSlug ?? crumb) : crumb;
         return (
           <span key={href} className="flex items-center gap-2">
             <span className="text-line">/</span>
             {isLast ? (
-              <span className="font-medium text-ink capitalize">{crumb}</span>
+              <span className="font-medium text-ink capitalize">{label}</span>
             ) : (
               <Link
                 href={href}
                 className="text-muted hover:text-ink transition-colors capitalize"
               >
-                {crumb}
+                {label}
               </Link>
             )}
           </span>

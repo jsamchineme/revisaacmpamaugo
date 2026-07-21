@@ -1,31 +1,28 @@
 import { prisma } from "@/lib/db";
+import { FormField, FormConfig } from "@/lib/form-config-types";
 
-interface FormField {
-  id: string;
-  type: string;
-  label: string;
-  placeholder?: string;
-  required: boolean;
-  options?: string[];
-  conditional?: string[];
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
-interface FormConfig {
-  title: string;
-  fields: FormField[];
-}
+function buildFieldHtml(field: FormField, numberOfInvitees: number): string {
+  const placeholder = field.placeholder ? ` placeholder="${escapeHtml(field.placeholder)}"` : "";
 
-function buildFieldHtml(field: FormField): string {
   switch (field.type) {
     case "select":
       return `<select id="${field.id}" name="${field.id}">
-        ${(field.options ?? []).map((o) => `<option value="${o}">${o}</option>`).join("")}
+        ${(field.options ?? []).map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join("")}
       </select>`;
 
     case "checkbox":
       return `<label>
         <input type="checkbox" id="${field.id}" name="${field.id}" />
-        <span>${field.label}</span>
+        <span>${escapeHtml(field.label)}</span>
       </label>`;
 
     case "radio":
@@ -33,20 +30,41 @@ function buildFieldHtml(field: FormField): string {
         .map(
           (o) =>
             `<label>
-              <input type="radio" name="${field.id}" value="${o}" /><span>${o}</span>
+              <input type="radio" name="${field.id}" value="${escapeHtml(o)}" /><span>${escapeHtml(o)}</span>
             </label>`
         )
         .join("");
 
     case "textarea":
-      return `<textarea id="${field.id}" name="${field.id}" rows="3" placeholder="${field.placeholder ?? ""}"></textarea>`;
+      return `<textarea id="${field.id}" name="${field.id}" rows="3"${placeholder}></textarea>`;
+
+    case "number": {
+      if (field.maxFromQuery && numberOfInvitees <= 0) {
+        return "";
+      }
+      const max = field.maxFromQuery && numberOfInvitees > 0
+        ? Math.min(numberOfInvitees, field.max ?? 5)
+        : field.max;
+      const maxAttr = max !== undefined ? ` max="${max}"` : "";
+      const value = field.maxFromQuery && numberOfInvitees > 0 ? ` value="${Math.min(numberOfInvitees, field.max ?? 5)}"` : "";
+      return `<input type="number" id="${field.id}" name="${field.id}" min="0"${maxAttr}${value}${placeholder} />`;
+    }
+
+    case "guestGroup":
+      return `<div id="__group_${field.id}" class="__guest_group"></div>`;
 
     default:
-      return `<input type="${field.type}" id="${field.id}" name="${field.id}" placeholder="${field.placeholder ?? ""}" />`;
+      return `<input type="${field.type}" id="${field.id}" name="${field.id}"${placeholder} />`;
   }
 }
 
-function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: boolean, isFull: boolean): string {
+function buildRsvpHtml(
+  formConfig: FormConfig | null,
+  slug: string,
+  isPast: boolean,
+  isFull: boolean,
+  numberOfInvitees: number
+): string {
   const isOpen = !isPast && !isFull;
 
   const statusHtml = isPast
@@ -63,32 +81,72 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
     return `<section id="__rsvp"><p>RSVP form coming soon.</p></section>`;
   }
 
-  // Split into regular fields and checkbox-triggered conditional fields
+  const checkboxControllers = formConfig.fields.filter(
+    (f) => f.type === "checkbox" && f.conditional?.length
+  );
   const checkboxConditionals = new Set(
-    formConfig.fields.filter((f) => f.type === "checkbox" && f.conditional?.length).flatMap((f) => f.conditional ?? [])
+    checkboxControllers.flatMap((f) => f.conditional ?? [])
   );
   const regularFields = formConfig.fields.filter((f) => !checkboxConditionals.has(f.id));
+
+  const conditionalControllerMap: Record<string, string> = {};
+  for (const controller of checkboxControllers) {
+    for (const condId of controller.conditional ?? []) {
+      conditionalControllerMap[condId] = controller.id;
+    }
+  }
+
+  const guestGroupFields = formConfig.fields.filter((f) => f.type === "guestGroup");
+  const guestGroupByCountField: Record<string, FormField> = {};
+  for (const group of guestGroupFields) {
+    if (group.countField) {
+      guestGroupByCountField[group.countField] = group;
+    }
+  }
 
   const fieldsHtml = regularFields
     .map((field) => {
       const isCheckbox = field.type === "checkbox";
       const label = isCheckbox
         ? ""
-        : `<label for="${field.id}">${field.label}${field.required ? " *" : ""}</label>`;
+        : `<label for="${field.id}">${escapeHtml(field.label)}${field.required ? " *" : ""}</label>`;
+
+      const controllerForThisField = conditionalControllerMap[field.id];
+      const preChecked =
+        field.type === "checkbox" &&
+        controllerForThisField === undefined &&
+        numberOfInvitees > 0 &&
+        field.conditional?.some((condId) => {
+          const cond = formConfig.fields.find((f) => f.id === condId);
+          return cond?.type === "number" && cond.maxFromQuery;
+        });
+
+      const fieldHtml =
+        field.type === "checkbox" && preChecked
+          ? `<label>
+              <input type="checkbox" id="${field.id}" name="${field.id}" checked />
+              <span>${escapeHtml(field.label)}</span>
+            </label>`
+          : buildFieldHtml(field, numberOfInvitees);
 
       const conditionalFields = field.conditional?.length
-        ? `<div id="__cond_${field.id}" style="display:none;">
+        ? `<div id="__cond_${field.id}" style="display:${preChecked ? "block" : "none"};">
             ${(field.conditional ?? [])
               .map((condId) => {
                 const condField = formConfig.fields.find((f) => f.id === condId);
                 if (!condField) return "";
+                if (condField.type === "number" && condField.maxFromQuery && numberOfInvitees <= 0) {
+                  return "";
+                }
+                if (condField.type === "guestGroup") {
+                  return `<div>
+                    ${buildFieldHtml(condField, numberOfInvitees)}
+                  </div>`;
+                }
                 return `<div>
-                  ${
-                    condField.id === "plusOneGuests"
-                      ? `<div id="__guests_wrap"></div>
-                         <button type="button" onclick="__addGuest()">+ Add Guest</button>`
-                      : `<label>${condField.label}${condField.required ? " *" : ""}</label>${buildFieldHtml(condField)}`
-                  }
+                  <label>${escapeHtml(condField.label)}${condField.required ? " *" : ""}</label>
+                  ${buildFieldHtml(condField, numberOfInvitees)}
+                  <div id="__err_${condField.id}" style="display:none;"></div>
                 </div>`;
               })
               .join("")}
@@ -97,18 +155,36 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
 
       return `<div id="__wrap_${field.id}">
         ${label}
-        ${buildFieldHtml(field)}
+        ${fieldHtml}
         <div id="__err_${field.id}" style="display:none;"></div>
         ${conditionalFields}
       </div>`;
     })
     .join("");
 
-  const hasPlusOne = formConfig.fields.some((f) => f.id === "plusOne" && f.type === "checkbox");
+  const guestGroupConfigJson = JSON.stringify(
+    guestGroupFields.map((group) => ({
+      id: group.id,
+      countField: group.countField,
+      max: group.max ?? 5,
+      subFields: group.subFields?.map((sub) => ({
+        id: sub.id,
+        type: sub.type,
+        label: sub.label,
+        placeholder: sub.placeholder,
+        required: sub.required,
+        options: sub.options,
+      })),
+    }))
+  );
+
+  const numberFieldIds = JSON.stringify(
+    formConfig.fields.filter((f) => f.type === "number").map((f) => f.id)
+  );
 
   return `
 <section id="__rsvp">
-  <h2>${formConfig.title || "RSVP"}</h2>
+  <h2>${escapeHtml(formConfig.title || "RSVP")}</h2>
   <div id="__rsvp_form_wrap">
     <div id="__rsvp_error" style="display:none;"></div>
     <form id="__rsvp_form" novalidate>
@@ -127,8 +203,10 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
 <script>
 (function() {
   var E164 = /^\\+[1-9][0-9]{7,14}$/;
-  var guestCount = 1;
-  var MAX_GUESTS = 5;
+  var conditionalControllers = ${JSON.stringify(conditionalControllerMap)};
+  var guestGroups = ${guestGroupConfigJson};
+  var numberFieldIds = ${numberFieldIds};
+  var numberOfInvitees = ${numberOfInvitees};
 
   function showError(fieldId, msg) {
     var el = document.getElementById('__err_' + fieldId);
@@ -142,47 +220,143 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
     });
   }
 
-  ${
-    hasPlusOne
-      ? `
-  window.__addGuest = function() {
-    if (guestCount >= MAX_GUESTS) return;
-    var wrap = document.getElementById('__guests_wrap');
-    if (!wrap) return;
-    var i = guestCount++;
-    var div = document.createElement('div');
-    div.id = '__guest_' + i;
-    div.innerHTML =
-      '<div>' +
-        '<strong>Guest ' + i + '</strong>' +
-        '<button type="button" onclick="this.closest(\\'[id^=__guest_]\\').remove();guestCount--;">Remove</button>' +
-      '</div>' +
-      '<div>' +
-        '<div><label>Title</label>' +
-          '<select name="guest_' + i + '_title">' +
-            '<option>Mr</option><option>Mrs</option><option>Ms</option><option>Dr</option>' +
-          '</select></div>' +
-        '<div><label>Full Name *</label>' +
-          '<input type="text" name="guest_' + i + '_fullname" placeholder="Jane Doe" /></div>' +
-        '<div><label>Phone *</label>' +
-          '<input type="tel" name="guest_' + i + '_phone" placeholder="+2348012345678" /></div>' +
-        '<div><label>Email</label>' +
-          '<input type="email" name="guest_' + i + '_email" placeholder="jane@email.com" /></div>' +
-      '</div>';
-    wrap.appendChild(div);
-  };
-  window.__addGuest();
-  `
-      : ""
+  function isConditionalVisible(fieldId) {
+    var controller = conditionalControllers[fieldId];
+    if (!controller) return true;
+    var cb = document.getElementById(controller);
+    return cb ? cb.checked : false;
   }
 
-  document.querySelectorAll('#__rsvp_form input[type="checkbox"]').forEach(function(cb) {
-    var condDiv = document.getElementById('__cond_' + cb.id);
-    if (!condDiv) return;
-    cb.addEventListener('change', function() {
-      condDiv.style.display = this.checked ? 'block' : 'none';
+  function buildGuestHtml(group, index) {
+    var html = '<div id="__guest_' + group.id + '_' + index + '" class="__guest_row" style="margin-bottom:16px;padding:12px;border:1px solid oklch(0.88 0.03 88);border-radius:4px;background:oklch(0.955 0.015 88);">';
+    html += '<strong style="display:block;margin-bottom:8px;">Guest ' + index + '</strong>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+    (group.subFields || []).forEach(function(sub) {
+      html += '<div style="grid-column:span ' + (sub.type === 'select' || sub.type === 'textarea' ? '2' : '1') + ';">';
+      html += '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">' + sub.label + (sub.required ? ' *' : '') + '</label>';
+      if (sub.type === 'select') {
+        html += '<select name="guest_' + index + '_' + sub.id + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;background:#fff;">';
+        (sub.options || []).forEach(function(opt) {
+          html += '<option value="' + opt + '">' + opt + '</option>';
+        });
+        html += '</select>';
+      } else if (sub.type === 'textarea') {
+        html += '<textarea name="guest_' + index + '_' + sub.id + '" rows="2" placeholder="' + (sub.placeholder || '') + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;"></textarea>';
+      } else {
+        html += '<input type="' + sub.type + '" name="guest_' + index + '_' + sub.id + '" placeholder="' + (sub.placeholder || '') + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;" />';
+      }
+      html += '</div>';
     });
-  });
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderGuestGroup(group) {
+    var wrap = document.getElementById('__group_' + group.id);
+    if (!wrap) return;
+    var countEl = document.getElementById(group.countField);
+    var count;
+    if (countEl && countEl.offsetParent !== null) {
+      count = parseInt(countEl.value, 10);
+      if (isNaN(count) || count < 0) count = 0;
+      if (count > group.max) count = group.max;
+    } else {
+      count = 1;
+    }
+    var html = '';
+    for (var i = 1; i <= count; i++) {
+      html += buildGuestHtml(group, i);
+    }
+    wrap.innerHTML = html;
+  }
+
+  function initGuestGroups() {
+    guestGroups.forEach(function(group) {
+      renderGuestGroup(group);
+      var countEl = document.getElementById(group.countField);
+      if (countEl) {
+        countEl.addEventListener('input', function() { renderGuestGroup(group); });
+      }
+    });
+  }
+
+  function initConditionals() {
+    document.querySelectorAll('#__rsvp_form input[type="checkbox"]').forEach(function(cb) {
+      var condDiv = document.getElementById('__cond_' + cb.id);
+      if (!condDiv) return;
+      cb.addEventListener('change', function() {
+        condDiv.style.display = this.checked ? 'block' : 'none';
+        if (this.checked) {
+          var hasNumberInput = false;
+          condDiv.querySelectorAll('input[type="number"]').forEach(function(input) {
+            hasNumberInput = true;
+            if (!input.value || parseInt(input.value, 10) === 0) {
+              input.value = '1';
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          });
+          if (!hasNumberInput) {
+            guestGroups.forEach(function(group) {
+              if (condDiv.contains(document.getElementById('__group_' + group.id))) {
+                renderGuestGroup(group);
+              }
+            });
+          }
+        } else {
+          condDiv.querySelectorAll('input[type="number"]').forEach(function(input) {
+            input.value = '0';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+          guestGroups.forEach(function(group) {
+            if (condDiv.contains(document.getElementById('__group_' + group.id))) {
+              var wrap = document.getElementById('__group_' + group.id);
+              if (wrap) wrap.innerHTML = '';
+            }
+          });
+        }
+      });
+    });
+  }
+
+  function validateGuestSubField(sub, value) {
+    var trimmed = (value || '').trim();
+    if (sub.required && trimmed === '') return sub.label + ' is required';
+    if (sub.type === 'tel' && trimmed && !E164.test(trimmed)) return 'Phone must be in E.164 format (e.g., +2348012345678)';
+    if (sub.type === 'email' && trimmed && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(trimmed)) return 'Please enter a valid email address';
+    return '';
+  }
+
+  function validateGuestGroup(group) {
+    var valid = true;
+    var wrap = document.getElementById('__group_' + group.id);
+    if (!wrap) return valid;
+    var count = getGuestCount(group);
+    for (var i = 1; i <= count; i++) {
+      var row = document.getElementById('__guest_' + group.id + '_' + i);
+      if (!row) continue;
+      (group.subFields || []).forEach(function(sub) {
+        var input = row.querySelector('[name="guest_' + i + '_' + sub.id + '"]');
+        var msg = validateGuestSubField(sub, input ? input.value : '');
+        if (msg) {
+          showError(group.id + '_' + i + '_' + sub.id, msg);
+          valid = false;
+        }
+      });
+    }
+    return valid;
+  }
+
+  function getGuestCount(group) {
+    var countEl = document.getElementById(group.countField);
+    if (countEl && countEl.offsetParent !== null) {
+      var val = parseInt(countEl.value, 10);
+      return isNaN(val) || val < 0 ? 0 : val > group.max ? group.max : val;
+    }
+    return 1;
+  }
+
+  initConditionals();
+  initGuestGroups();
 
   document.getElementById('__rsvp_form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -194,7 +368,7 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
 
     formEl.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), select, textarea').forEach(function(el) {
       if (el.name && !el.name.startsWith('guest_')) {
-        payload[el.name] = el.value.trim();
+        payload[el.name] = el.type === 'number' ? parseInt(el.value, 10) || 0 : el.value.trim();
       }
     });
     formEl.querySelectorAll('input[type="checkbox"]').forEach(function(el) {
@@ -205,53 +379,61 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
     });
 
     ${regularFields
-      .filter((f) => f.required && f.type !== "checkbox")
+      .filter((f) => f.required && f.type !== "checkbox" && f.type !== "guestGroup")
       .map(
-        (f) => `
-    if (!payload['${f.id}'] || payload['${f.id}'] === '') {
-      showError('${f.id}', '${f.label} is required');
+        (f) => {
+          const controller = conditionalControllerMap[f.id];
+          const visibilityCheck = controller ? `if (isConditionalVisible('${f.id}')) {` : ``;
+          const visibilityClose = controller ? `}` : ``;
+          return `
+    ${visibilityCheck}
+    if (isConditionalVisible('${f.id}') && (!payload['${f.id}'] && payload['${f.id}'] !== 0)) {
+      showError('${f.id}', '${escapeHtml(f.label)} is required');
       valid = false;
     }${
       f.type === "tel"
-        ? ` else if (!E164.test(payload['${f.id}'])) {
+        ? ` else if (isConditionalVisible('${f.id}') && payload['${f.id}'] && !E164.test(payload['${f.id}'])) {
       showError('${f.id}', 'Phone must be in E.164 format (e.g., +2348012345678)');
       valid = false;
     }`
         : f.type === "email"
-          ? ` else if (payload['${f.id}'] && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(payload['${f.id}'])) {
+          ? ` else if (isConditionalVisible('${f.id}') && payload['${f.id}'] && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(payload['${f.id}'])) {
       showError('${f.id}', 'Please enter a valid email address');
       valid = false;
     }`
           : ""
-    }`
+    }
+    ${visibilityClose}`;
+        }
       )
       .join("")}
 
-    ${
-      hasPlusOne
-        ? `
-    if (payload['plusOne']) {
-      var guests = [];
-      document.querySelectorAll('[id^="__guest_"]').forEach(function(gDiv) {
-        var idx = gDiv.id.replace('__guest_', '');
-        var fn = gDiv.querySelector('[name="guest_' + idx + '_fullname"]');
-        var ph = gDiv.querySelector('[name="guest_' + idx + '_phone"]');
-        var em = gDiv.querySelector('[name="guest_' + idx + '_email"]');
-        var ti = gDiv.querySelector('[name="guest_' + idx + '_title"]');
-        if (!fn || !fn.value.trim()) { valid = false; return; }
-        if (!ph || !E164.test(ph.value.trim())) { valid = false; return; }
-        guests.push({ title: ti ? ti.value : 'Mr', fullname: fn.value.trim(), phone: ph.value.trim(), email: em ? em.value.trim() : '' });
-      });
-      payload['plusOneGuests'] = guests;
-    } else {
-      payload['plusOne'] = false;
-      payload['plusOneGuests'] = [];
-    }
-    `
-        : ""
-    }
+    // Validate guest groups
+    guestGroups.forEach(function(group) {
+      if (!isConditionalVisible(group.id)) return;
+      if (!validateGuestGroup(group)) valid = false;
+    });
 
     if (!valid) return;
+
+    // Build plusOneGuests payload from guest group
+    var plusOneGuests = [];
+    guestGroups.forEach(function(group) {
+      if (!isConditionalVisible(group.id)) return;
+      var count = getGuestCount(group);
+      for (var i = 1; i <= count; i++) {
+        var row = document.getElementById('__guest_' + group.id + '_' + i);
+        if (!row) continue;
+        var guest = {};
+        (group.subFields || []).forEach(function(sub) {
+          var input = row.querySelector('[name="guest_' + i + '_' + sub.id + '"]');
+          guest[sub.id] = input ? input.value.trim() : '';
+        });
+        plusOneGuests.push(guest);
+      }
+    });
+    payload['plusOneGuests'] = plusOneGuests;
+    if (!('plusOne' in payload)) payload['plusOne'] = plusOneGuests.length > 0;
 
     var btn = document.getElementById('__rsvp_btn');
     btn.disabled = true;
@@ -286,11 +468,20 @@ function buildRsvpHtml(formConfig: FormConfig | null, slug: string, isPast: bool
 </script>`;
 }
 
+function parseNumberOfInvitees(raw: string | string[] | null | undefined): number {
+  if (raw === null || raw === undefined) return 0;
+  const value = typeof raw === "string" ? parseInt(raw, 10) : NaN;
+  if (Number.isNaN(value) || value < 1) return 0;
+  return Math.min(value, 5);
+}
+
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
+  const { searchParams } = new URL(request.url);
+  const numberOfInvitees = parseNumberOfInvitees(searchParams.get("noi"));
 
   const event = await prisma.event.findUnique({
     where: { slug },
@@ -308,16 +499,30 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  const registrationCount = await prisma.registration.count({
+  const registrations = await prisma.registration.findMany({
     where: { eventId: event.id },
+    select: { plusOneGuests: true },
   });
+
+  const attendeeCount = registrations.reduce((sum, r) => {
+    let guestCount = 0;
+    if (r.plusOneGuests) {
+      try {
+        const guests = JSON.parse(r.plusOneGuests);
+        if (Array.isArray(guests)) guestCount = guests.length;
+      } catch (err) {
+        console.error("Failed to parse plusOneGuests for render attendee count:", err);
+      }
+    }
+    return sum + 1 + guestCount;
+  }, 0);
 
   const eventDate = new Date(event.date);
   const now = new Date();
   const isPast = eventDate < now;
   const isFull =
     event.capacity !== null && event.capacity !== undefined
-      ? registrationCount >= event.capacity
+      ? attendeeCount >= event.capacity
       : false;
 
   const formattedDate = eventDate.toLocaleDateString("en-US", {
@@ -340,7 +545,7 @@ export async function GET(
     }
   }
 
-  const rsvpHtml = buildRsvpHtml(formConfig, slug, isPast, isFull);
+  const rsvpHtml = buildRsvpHtml(formConfig, slug, isPast, isFull, numberOfInvitees);
 
   let html = event.designContent
     .replace(/\{\{eventTitle\}\}/g, event.title)
@@ -349,21 +554,15 @@ export async function GET(
     .replace(/\{\{venue\}\}/g, "");
 
   // Strip leaked dc-runtime artifact content that may follow {{rsvpForm}} in stored templates.
-  // Pattern: {{rsvpForm}} immediately followed by non-whitespace junk up to a </section>.
   if (html.includes("{{rsvpForm}}") && !html.match(/\{\{rsvpForm\}\}\s*\n/)) {
     html = html.replace(/\{\{rsvpForm\}\}[\s\S]*?<\/section>/, "{{rsvpForm}}");
   }
 
-  // Ensure the countdown section (identified by __cd_days) is closed before {{rsvpForm}}.
-  // If {{rsvpForm}} appears directly inside the countdown flex container, close it and add
-  // an event details section in between.
   if (html.includes("__cd_days") && html.includes("{{rsvpForm}}")) {
-    // Check if </section> appears between the countdown heading and {{rsvpForm}}
     const cdIdx = html.indexOf("__cd_days");
     const rsvpIdx = html.indexOf("{{rsvpForm}}");
     const sectionCloseBetween = html.indexOf("</section>", cdIdx);
     if (sectionCloseBetween === -1 || sectionCloseBetween > rsvpIdx) {
-      // No </section> before {{rsvpForm}} — countdown section is unclosed; inject close + details
       const DETAILS = `
   </section>
 
@@ -374,11 +573,11 @@ export async function GET(
       <div style="display:flex;justify-content:center;gap:clamp(32px,6vw,80px);flex-wrap:wrap;">
         <div style="min-width:180px;">
           <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE DATE</div>
-          <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,24px);margin:0;color:oklch(0.32 0.04 70);">Saturday, December 26, 2026</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,24px);margin:0;color:oklch(0.32 0.04 70);">${formattedDate}</p>
         </div>
         <div style="min-width:180px;">
           <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE TIME</div>
-          <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,24px);margin:0;color:oklch(0.32 0.04 70);">Promptly at 11:00 AM</p>
+          <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,24px);margin:0;color:oklch(0.32 0.04 70);">${formattedTime}</p>
         </div>
         <div style="min-width:180px;">
           <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE PLACE</div>
@@ -387,53 +586,14 @@ export async function GET(
       </div>
     </div>
   </section>
-
-  `;
+`;
       html = html.slice(0, rsvpIdx) + DETAILS + html.slice(rsvpIdx);
     }
   }
 
-  // Upgrade the __rsvp_styles block to the current version (handles stored old templates)
-  const RSVP_STYLES = `<style id="__rsvp_styles">
-#__rsvp{padding:clamp(72px,10vw,120px) 24px;background:oklch(0.93 0.025 88);text-align:center;}
-#__rsvp h2{font-family:'Cinzel',serif;font-weight:400;font-size:clamp(30px,4.5vw,48px);color:oklch(0.3 0.04 70);margin:0 0 26px;}
-#__rsvp_form_wrap{max-width:560px;margin:0 auto;background:oklch(0.965 0.018 88);padding:clamp(32px,5vw,52px);border-top:3px solid oklch(0.72 0.11 82);box-shadow:0 12px 34px oklch(0.3 0.04 70 / 0.1);text-align:left;}
-#__rsvp form>div{margin-bottom:22px;}
-#__rsvp label:not([style]):not(:has(input[type=checkbox])):not(:has(input[type=radio])){display:block;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:oklch(0.5 0.06 70);margin-bottom:8px;text-transform:uppercase;}
-#__rsvp label:has(input[type=checkbox]){display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:14px 0;border-top:1px solid oklch(0.88 0.03 88);}
-#__rsvp label:has(input[type=checkbox]) span{font-family:'Cormorant Garamond',serif;font-size:19px;color:oklch(0.32 0.04 70);line-height:1.4;}
-#__rsvp input[type=text],#__rsvp input[type=email],#__rsvp input[type=tel],#__rsvp select,#__rsvp textarea{width:100%;box-sizing:border-box;padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:19px;color:oklch(0.28 0.03 70);background:#fff;border:1px solid oklch(0.8 0.05 82);border-radius:2px;outline:none;margin-top:6px;}
-#__rsvp input[type=text]:focus,#__rsvp input[type=email]:focus,#__rsvp input[type=tel]:focus,#__rsvp select:focus,#__rsvp textarea:focus{border-color:oklch(0.55 0.1 82);outline:none;}
-#__rsvp input[type=checkbox]{width:20px;height:20px;min-width:20px;accent-color:oklch(0.55 0.1 82);cursor:pointer;margin-top:3px;}
-#__rsvp [id^=__cond_]{padding:16px;margin-top:8px;background:oklch(0.955 0.015 88);border-left:2px solid oklch(0.78 0.08 82);}
-#__rsvp [id^=__cond_]>div{margin-bottom:14px;}
-#__rsvp [id^=__cond_] label{display:block !important;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:oklch(0.5 0.06 70);margin-bottom:8px;text-transform:uppercase;padding:0 !important;border:none !important;}
-#__rsvp_btn{width:100%;margin-top:22px;padding:17px;font-family:'Cinzel',serif;font-size:15px;letter-spacing:0.14em;color:oklch(0.96 0.02 88);background:oklch(0.4 0.06 70);border:none;border-radius:2px;cursor:pointer;transition:background 0.2s;}
-#__rsvp_btn:hover{background:oklch(0.34 0.07 70);}
-#__rsvp_btn:disabled{opacity:.65;cursor:not-allowed;}
-#__rsvp_error{padding:10px 14px;margin-bottom:16px;background:rgba(192,57,43,.08);border-left:3px solid #c0392b;color:#c0392b;text-align:left;font-family:'Cormorant Garamond',serif;font-size:17px;}
-#__rsvp_success{padding:48px 24px;text-align:center;}
-#__rsvp_success h3{font-family:'Cinzel',serif;font-weight:400;font-size:clamp(22px,3vw,32px);color:oklch(0.3 0.04 70);margin:16px 0 12px;}
-#__rsvp_success p{font-family:'Cormorant Garamond',serif;font-size:20px;color:oklch(0.45 0.03 70);}
-[id^=__err_]{font-family:'Cormorant Garamond',serif;font-size:15px;color:#c0392b;margin-top:4px;}
-</style>`;
-  if (html.includes('<style id="__rsvp_styles">')) {
-    html = html.replace(/<style id="__rsvp_styles">[\s\S]*?<\/style>/, RSVP_STYLES);
-  } else {
-    html = html.replace("</head>", `${RSVP_STYLES}\n</head>`);
-  }
-
-  if (html.includes("{{rsvpForm}}")) {
-    html = html.replace("{{rsvpForm}}", rsvpHtml);
-  } else if (html.includes("</body>")) {
-    html = html.replace("</body>", `${rsvpHtml}</body>`);
-  } else {
-    html += rsvpHtml;
-  }
+  html = html.replace("{{rsvpForm}}", rsvpHtml);
 
   return new Response(html, {
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-    },
+    headers: { "Content-Type": "text/html; charset=utf-8" },
   });
 }
