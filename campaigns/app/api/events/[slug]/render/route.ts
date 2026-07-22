@@ -219,15 +219,26 @@ function buildRsvpHtml(
   <h2>${escapeHtml(formConfig.title || "RSVP")}</h2>
   <div id="__rsvp_form_wrap">
     <div id="__rsvp_error" style="display:none;"></div>
+    <div style="display:flex;border:1px solid oklch(0.8 0.05 82);border-radius:2px;overflow:hidden;margin-bottom:28px;">
+      <button type="button" id="__att_yes" onclick="__setAttending(true)" style="flex:1;padding:10px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.1em;border:none;cursor:pointer;background:oklch(0.4 0.06 70);color:#fff;transition:background 0.15s;">I WILL ATTEND</button>
+      <button type="button" id="__att_no" onclick="__setAttending(false)" style="flex:1;padding:10px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.1em;border:none;cursor:pointer;background:oklch(0.94 0.015 88);color:oklch(0.45 0.03 70);transition:background 0.15s;">CAN'T MAKE IT</button>
+    </div>
     <form id="__rsvp_form" novalidate>
-      ${fieldsHtml}
+      <div id="__rsvp_fields">${fieldsHtml}</div>
       <button type="submit" id="__rsvp_btn">Register</button>
     </form>
   </div>
   <div id="__rsvp_success" style="display:none;">
-    <div style="font-size:48px;">🎉</div>
-    <h3>Registration Successful!</h3>
-    <p>Thank you for registering. We look forward to celebrating with you!</p>
+    <div id="__rsvp_success_attending">
+      <div style="font-size:48px;">🎉</div>
+      <h3>Registration Successful!</h3>
+      <p>Thank you for registering. We look forward to celebrating with you!</p>
+    </div>
+    <div id="__rsvp_success_notattending" style="display:none;">
+      <div style="font-size:48px;">💛</div>
+      <h3>We'll Miss You!</h3>
+      <p>Thank you for letting us know. We'll be thinking of you on the day.</p>
+    </div>
   </div>
   <p style="font-family:'Cormorant Garamond',serif;font-size:18px;margin:44px auto 0;max-width:560px;color:oklch(0.45 0.03 70);">Questions? Call Deborah Odunze (<a href="tel:+2349139243949" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 913 924 3949</a>) or Olabisi Aweda (<a href="tel:+2349020664053" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 902 066 4053</a>).</p>
 </section>
@@ -240,6 +251,28 @@ function buildRsvpHtml(
   var numberFieldIds = ${numberFieldIds};
   var numberOfInvitees = ${numberOfInvitees};
   var __phoneListHtml = ${JSON.stringify(buildPhoneCountryListItems())};
+  var __attending = true;
+
+  window.__setAttending = function(val) {
+    __attending = val;
+    var yesBtn = document.getElementById('__att_yes');
+    var noBtn = document.getElementById('__att_no');
+    var fields = document.getElementById('__rsvp_fields');
+    var btn = document.getElementById('__rsvp_btn');
+    var activeStyle = 'background:oklch(0.4 0.06 70);color:#fff;';
+    var inactiveStyle = 'background:oklch(0.94 0.015 88);color:oklch(0.45 0.03 70);';
+    if (val) {
+      yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
+      noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
+      fields.style.display = '';
+      btn.textContent = 'Register';
+    } else {
+      yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
+      noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
+      fields.style.display = 'none';
+      btn.textContent = "Send Regrets";
+    }
+  };
 
   function showError(fieldId, msg) {
     var el = document.getElementById('__err_' + fieldId);
@@ -261,7 +294,7 @@ function buildRsvpHtml(
   }
 
   function buildGuestHtml(group, index) {
-    var html = '<div id="__guest_' + group.id + '_' + index + '" class="__guest_row" style="margin-bottom:16px;padding:12px;border:1px solid oklch(0.88 0.03 88);border-radius:4px;background:oklch(0.955 0.015 88);">';
+    var html = '<div id="__guest_' + group.id + '_' + index + '" class="__guest_row" style="margin-bottom:16px;padding:12px 0;">';
     html += '<strong style="display:block;margin-bottom:8px;">Guest ' + index + '</strong>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
     (group.subFields || []).forEach(function(sub) {
@@ -456,9 +489,42 @@ function buildRsvpHtml(
     e.preventDefault();
     clearErrors();
 
-    var payload = {};
+    var payload = { attending: __attending };
     var valid = true;
     var formEl = document.getElementById('__rsvp_form');
+
+    if (!__attending) {
+      var btn = document.getElementById('__rsvp_btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+      try {
+        var res = await fetch('/events/${slug}/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ attending: false, fullname: '', title: '' })
+        });
+        var data = await res.json().catch(function() { return {}; });
+        if (res.ok) {
+          document.getElementById('__rsvp_form_wrap').style.display = 'none';
+          document.getElementById('__rsvp_success').style.display = 'block';
+          document.getElementById('__rsvp_success_attending').style.display = 'none';
+          document.getElementById('__rsvp_success_notattending').style.display = 'block';
+        } else {
+          var errEl = document.getElementById('__rsvp_error');
+          errEl.textContent = data.error || 'Submission failed. Please try again.';
+          errEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Send Regrets';
+        }
+      } catch (err) {
+        var errEl = document.getElementById('__rsvp_error');
+        errEl.textContent = 'Something went wrong. Please try again.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Send Regrets';
+      }
+      return;
+    }
 
     formEl.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), select, textarea').forEach(function(el) {
       if (el.name && !el.name.startsWith('guest_')) {
@@ -543,6 +609,8 @@ function buildRsvpHtml(
       if (res.ok) {
         document.getElementById('__rsvp_form_wrap').style.display = 'none';
         document.getElementById('__rsvp_success').style.display = 'block';
+        document.getElementById('__rsvp_success_attending').style.display = 'block';
+        document.getElementById('__rsvp_success_notattending').style.display = 'none';
       } else {
         var errEl = document.getElementById('__rsvp_error');
         errEl.textContent = data.error || 'Registration failed. Please try again.';

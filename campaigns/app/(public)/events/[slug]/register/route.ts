@@ -12,9 +12,10 @@ const guestSchema = z.object({
 
 const registrationSchema = z.object({
   title: z.string().optional().or(z.literal("")),
-  fullname: z.string().min(1, "Full name is required"),
-  phone: z.string().regex(/^\+[1-9][0-9]{7,14}$/, "Phone must be in E.164 format (e.g., +2348012345678)"),
+  fullname: z.string().optional().or(z.literal("")),
+  phone: z.string().regex(/^\+[1-9][0-9]{7,14}$/, "Phone must be in E.164 format (e.g., +2348012345678)").or(z.literal("")).optional(),
   email: z.string().email("Valid email required").optional().or(z.literal("")),
+  attending: z.boolean().default(true),
   plusOne: z.boolean().default(false),
   plusOneGuests: z.array(guestSchema).max(5, "Maximum 5 guests allowed").default([]),
   whatsappOptIn: z.boolean().default(false),
@@ -75,7 +76,23 @@ export async function POST(
       );
     }
 
-    if (event.capacity !== null && event.capacity !== undefined) {
+    const isAttending = parsed.data.attending !== false;
+
+    if (isAttending && !parsed.data.fullname) {
+      return NextResponse.json(
+        { error: "Validation failed", details: { fieldErrors: { fullname: ["Full name is required"] } } },
+        { status: 400 }
+      );
+    }
+
+    if (isAttending && !parsed.data.phone) {
+      return NextResponse.json(
+        { error: "Phone number is required for attendees" },
+        { status: 400 }
+      );
+    }
+
+    if (isAttending && event.capacity !== null && event.capacity !== undefined) {
       const existingRegistrations = await prisma.registration.findMany({
         where: { eventId: event.id },
         select: { plusOneGuests: true },
@@ -104,11 +121,11 @@ export async function POST(
       }
     }
 
-    const { title, fullname, phone, email, plusOne, plusOneGuests, whatsappOptIn, ...rest } = parsed.data;
+    const { title, fullname, phone, email, attending, plusOne, plusOneGuests, whatsappOptIn, ...rest } = parsed.data;
 
     // Extract known fields, store the rest as customData
-    const knownFields = new Set(["title", "fullname", "phone", "email", "plusOne", "plusOneGuests", "whatsappOptIn"]);
-    const customData: Record<string, unknown> = {};
+    const knownFields = new Set(["title", "fullname", "phone", "email", "attending", "plusOne", "plusOneGuests", "whatsappOptIn"]);
+    const customData: Record<string, unknown> = { attending: attending !== false };
     for (const [key, value] of Object.entries(rest)) {
       if (!knownFields.has(key)) {
         customData[key] = value;
@@ -118,14 +135,14 @@ export async function POST(
     const registration = await prisma.registration.create({
       data: {
         eventId: event.id,
-        title: title || "Mr",
+        title: title || "",
         fullname,
-        phone,
+        phone: phone || "",
         email: email || null,
-        plusOne,
-        plusOneGuests: plusOneGuests.length > 0 ? JSON.stringify(plusOneGuests) : null,
-        whatsappOptIn,
-        customData: Object.keys(customData).length > 0 ? JSON.stringify(customData) : null,
+        plusOne: isAttending ? plusOne : false,
+        plusOneGuests: isAttending && plusOneGuests.length > 0 ? JSON.stringify(plusOneGuests) : null,
+        whatsappOptIn: isAttending ? whatsappOptIn : false,
+        customData: JSON.stringify(customData),
       },
     });
 
