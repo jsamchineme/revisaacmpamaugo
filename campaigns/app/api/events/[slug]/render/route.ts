@@ -214,7 +214,7 @@ function buildRsvpHtml(
   );
 
   return `
-<style>@media (max-width:600px){.__phone_col{grid-column:span 2 !important;}}</style>
+<style>@media (max-width:600px){.__phone_col{grid-column:span 2 !important;}} #__rsvp [id^=__wrap_]{margin-bottom:22px;}</style>
 <section id="__rsvp">
   <h2>${escapeHtml(formConfig.title || "RSVP")}</h2>
   <div id="__rsvp_form_wrap">
