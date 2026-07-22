@@ -21,7 +21,7 @@ function buildPhoneCountryListItems(): string {
 function buildPhoneGroupHtml(id: string, name: string, placeholder: string): string {
   const listItems = buildPhoneCountryListItems();
   const dropStyle = "display:none;position:absolute;top:calc(100% + 2px);left:0;z-index:1000;width:280px;background:#fff;border:1px solid oklch(0.8 0.05 82);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.12);overflow:hidden;";
-  return `<div class="__phone_group" style="position:relative;display:flex;">
+  return `<div class="__phone_group" style="position:relative;display:flex;margin-top:10px;">
   <button type="button" onclick="__togPhone(this)" style="flex-shrink:0;width:110px;display:flex;align-items:center;gap:6px;padding:14px 12px;border:1px solid oklch(0.8 0.05 82);border-right:none;border-radius:2px 0 0 2px;background:oklch(0.955 0.015 88);cursor:pointer;white-space:nowrap;font-family:inherit;font-size:19px;box-sizing:border-box;">
     <img class="__phone_flag" src="https://flagcdn.com/w20/ng.png" width="20" height="15" style="border-radius:2px;object-fit:cover;flex-shrink:0;" />
     <span class="__phone_code" style="font-weight:500;flex:1;text-align:left;">+234</span>
@@ -214,6 +214,7 @@ function buildRsvpHtml(
   );
 
   return `
+<style>@media (max-width:600px){.__phone_col{grid-column:span 2 !important;}}</style>
 <section id="__rsvp">
   <h2>${escapeHtml(formConfig.title || "RSVP")}</h2>
   <div id="__rsvp_form_wrap">
@@ -264,11 +265,11 @@ function buildRsvpHtml(
     html += '<strong style="display:block;margin-bottom:8px;">Guest ' + index + '</strong>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
     (group.subFields || []).forEach(function(sub) {
-      html += '<div style="grid-column:span ' + (sub.type === 'select' || sub.type === 'textarea' ? '2' : '1') + ';">';
+      html += '<div class="' + (sub.type === 'tel' || sub.type === 'email' ? '__phone_col' : '') + '" style="grid-column:span ' + (sub.type === 'select' || sub.type === 'textarea' ? '2' : '1') + ';">';
       html += '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">' + sub.label + (sub.required ? ' *' : '') + '</label>';
       if (sub.type === 'tel') {
         var fieldName = 'guest_' + index + '_' + sub.id;
-        html += '<div class="__phone_group" style="position:relative;display:flex;">';
+        html += '<div class="__phone_group" style="position:relative;display:flex;margin-top:10px;">';
         html += '<button type="button" onclick="__togPhone(this)" style="flex-shrink:0;width:110px;display:flex;align-items:center;gap:6px;padding:14px 12px;border:1px solid oklch(0.8 0.05 82);border-right:none;border-radius:2px 0 0 2px;background:oklch(0.955 0.015 88);cursor:pointer;white-space:nowrap;font-family:inherit;font-size:19px;box-sizing:border-box;">';
         html += '<img class="__phone_flag" src="https://flagcdn.com/w20/ng.png" width="20" height="15" style="border-radius:2px;object-fit:cover;" />';
         html += '<span class="__phone_code" style="font-weight:500;flex:1;text-align:left;">+234</span>';
