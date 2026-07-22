@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { FormField, FormConfig } from "@/lib/form-config-types";
+import { COUNTRIES } from "@/lib/countries";
 
 function escapeHtml(str: string): string {
   return str
@@ -8,6 +9,33 @@ function escapeHtml(str: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function buildPhoneCountryListItems(): string {
+  return COUNTRIES.map((c) => {
+    const iso = c.isoCode.toLowerCase();
+    return `<li><button type="button" onclick="__selPhone(this,'${c.dialCode}','${iso}')" style="display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;font-size:13px;text-align:left;" onmouseover="this.style.background='oklch(0.95 0.015 88)'" onmouseout="this.style.background='transparent'"><img src="https://flagcdn.com/w20/${iso}.png" width="20" height="15" style="border-radius:2px;object-fit:cover;flex-shrink:0;" /><span style="flex:1;">${escapeHtml(c.name)}</span><span style="color:#888;flex-shrink:0;">${c.dialCode}</span></button></li>`;
+  }).join("");
+}
+
+function buildPhoneGroupHtml(id: string, name: string, placeholder: string): string {
+  const listItems = buildPhoneCountryListItems();
+  const dropStyle = "display:none;position:absolute;top:calc(100% + 2px);left:0;z-index:1000;width:280px;background:#fff;border:1px solid oklch(0.8 0.05 82);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.12);overflow:hidden;";
+  return `<div class="__phone_group" style="position:relative;display:flex;">
+  <button type="button" onclick="__togPhone(this)" style="flex-shrink:0;width:110px;display:flex;align-items:center;gap:6px;padding:14px 12px;border:1px solid oklch(0.8 0.05 82);border-right:none;border-radius:2px 0 0 2px;background:oklch(0.955 0.015 88);cursor:pointer;white-space:nowrap;font-family:inherit;font-size:19px;box-sizing:border-box;">
+    <img class="__phone_flag" src="https://flagcdn.com/w20/ng.png" width="20" height="15" style="border-radius:2px;object-fit:cover;flex-shrink:0;" />
+    <span class="__phone_code" style="font-weight:500;flex:1;text-align:left;">+234</span>
+    <span style="font-size:12px;color:#888;">▾</span>
+  </button>
+  <div class="__phone_drop" style="${dropStyle}">
+    <div style="padding:8px;border-bottom:1px solid oklch(0.88 0.03 88);">
+      <input type="text" placeholder="Search country…" oninput="__filtPhone(this)" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;font-size:13px;outline:none;font-family:inherit;" />
+    </div>
+    <ul class="__phone_list" style="max-height:220px;overflow-y:auto;list-style:none;margin:0;padding:0;">${listItems}</ul>
+  </div>
+  <input type="tel" class="__phone_num" placeholder="${escapeHtml(placeholder || "Phone number")}" style="flex:1;min-width:0;box-sizing:border-box;border:1px solid oklch(0.8 0.05 82);border-radius:0 2px 2px 0;margin-top:0;" />
+  <input type="hidden" id="${id}" name="${name}" />
+</div>`;
 }
 
 function buildFieldHtml(field: FormField, numberOfInvitees: number): string {
@@ -49,6 +77,9 @@ function buildFieldHtml(field: FormField, numberOfInvitees: number): string {
       const value = field.maxFromQuery && numberOfInvitees > 0 ? ` value="${Math.min(numberOfInvitees, field.max ?? 5)}"` : "";
       return `<input type="number" id="${field.id}" name="${field.id}" min="0"${maxAttr}${value}${placeholder} />`;
     }
+
+    case "tel":
+      return buildPhoneGroupHtml(field.id, field.id, field.placeholder ?? "");
 
     case "guestGroup":
       return `<div id="__group_${field.id}" class="__guest_group"></div>`;
@@ -197,7 +228,7 @@ function buildRsvpHtml(
     <h3>Registration Successful!</h3>
     <p>Thank you for registering. We look forward to celebrating with you!</p>
   </div>
-  <p style="font-family:'Cormorant Garamond',serif;font-size:18px;margin:44px auto 0;max-width:560px;color:oklch(0.45 0.03 70);">Questions? Call Dr. Deborah Odunze (<a href="tel:+2349139243949" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 913 924 3949</a>) or Olabisi Aweda (<a href="tel:+2349020664053" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 902 066 4053</a>).</p>
+  <p style="font-family:'Cormorant Garamond',serif;font-size:18px;margin:44px auto 0;max-width:560px;color:oklch(0.45 0.03 70);">Questions? Call Deborah Odunze (<a href="tel:+2349139243949" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 913 924 3949</a>) or Olabisi Aweda (<a href="tel:+2349020664053" style="color:oklch(0.5 0.09 82);text-decoration:none;">+234 902 066 4053</a>).</p>
 </section>
 
 <script>
@@ -207,6 +238,7 @@ function buildRsvpHtml(
   var guestGroups = ${guestGroupConfigJson};
   var numberFieldIds = ${numberFieldIds};
   var numberOfInvitees = ${numberOfInvitees};
+  var __phoneListHtml = ${JSON.stringify(buildPhoneCountryListItems())};
 
   function showError(fieldId, msg) {
     var el = document.getElementById('__err_' + fieldId);
@@ -234,16 +266,31 @@ function buildRsvpHtml(
     (group.subFields || []).forEach(function(sub) {
       html += '<div style="grid-column:span ' + (sub.type === 'select' || sub.type === 'textarea' ? '2' : '1') + ';">';
       html += '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">' + sub.label + (sub.required ? ' *' : '') + '</label>';
-      if (sub.type === 'select') {
-        html += '<select name="guest_' + index + '_' + sub.id + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;background:#fff;">';
+      if (sub.type === 'tel') {
+        var fieldName = 'guest_' + index + '_' + sub.id;
+        html += '<div class="__phone_group" style="position:relative;display:flex;">';
+        html += '<button type="button" onclick="__togPhone(this)" style="flex-shrink:0;width:110px;display:flex;align-items:center;gap:6px;padding:14px 12px;border:1px solid oklch(0.8 0.05 82);border-right:none;border-radius:2px 0 0 2px;background:oklch(0.955 0.015 88);cursor:pointer;white-space:nowrap;font-family:inherit;font-size:19px;box-sizing:border-box;">';
+        html += '<img class="__phone_flag" src="https://flagcdn.com/w20/ng.png" width="20" height="15" style="border-radius:2px;object-fit:cover;" />';
+        html += '<span class="__phone_code" style="font-weight:500;flex:1;text-align:left;">+234</span>';
+        html += '<span style="font-size:12px;color:#888;">▾</span>';
+        html += '</button>';
+        html += '<div class="__phone_drop" style="display:none;position:absolute;top:calc(100% + 2px);left:0;z-index:1000;width:280px;background:#fff;border:1px solid oklch(0.8 0.05 82);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.12);overflow:hidden;">';
+        html += '<div style="padding:8px;border-bottom:1px solid oklch(0.88 0.03 88);"><input type="text" placeholder="Search country…" oninput="__filtPhone(this)" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;font-size:13px;outline:none;font-family:inherit;" /></div>';
+        html += '<ul class="__phone_list" style="max-height:220px;overflow-y:auto;list-style:none;margin:0;padding:0;">' + __phoneListHtml + '</ul>';
+        html += '</div>';
+        html += '<input type="tel" class="__phone_num" placeholder="' + (sub.placeholder || 'Phone number') + '" style="flex:1;min-width:0;box-sizing:border-box;border:1px solid oklch(0.8 0.05 82);border-radius:0 2px 2px 0;margin-top:0;" />';
+        html += '<input type="hidden" name="' + fieldName + '" />';
+        html += '</div>';
+      } else if (sub.type === 'select') {
+        html += '<select name="guest_' + index + '_' + sub.id + '" style="width:100%;box-sizing:border-box;border:1px solid oklch(0.8 0.05 82);border-radius:2px;background:#fff;">';
         (sub.options || []).forEach(function(opt) {
           html += '<option value="' + opt + '">' + opt + '</option>';
         });
         html += '</select>';
       } else if (sub.type === 'textarea') {
-        html += '<textarea name="guest_' + index + '_' + sub.id + '" rows="2" placeholder="' + (sub.placeholder || '') + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;"></textarea>';
+        html += '<textarea name="guest_' + index + '_' + sub.id + '" rows="2" placeholder="' + (sub.placeholder || '') + '" style="width:100%;box-sizing:border-box;border:1px solid oklch(0.8 0.05 82);border-radius:2px;"></textarea>';
       } else {
-        html += '<input type="' + sub.type + '" name="guest_' + index + '_' + sub.id + '" placeholder="' + (sub.placeholder || '') + '" style="width:100%;padding:8px;border:1px solid oklch(0.8 0.05 82);border-radius:2px;" />';
+        html += '<input type="' + sub.type + '" name="guest_' + index + '_' + sub.id + '" placeholder="' + (sub.placeholder || '') + '" style="width:100%;box-sizing:border-box;border:1px solid oklch(0.8 0.05 82);border-radius:2px;" />';
       }
       html += '</div>';
     });
@@ -321,7 +368,7 @@ function buildRsvpHtml(
   function validateGuestSubField(sub, value) {
     var trimmed = (value || '').trim();
     if (sub.required && trimmed === '') return sub.label + ' is required';
-    if (sub.type === 'tel' && trimmed && !E164.test(trimmed)) return 'Phone must be in E.164 format (e.g., +2348012345678)';
+    if (sub.type === 'tel' && trimmed && !E164.test(trimmed)) return 'Please enter a valid phone number';
     if (sub.type === 'email' && trimmed && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(trimmed)) return 'Please enter a valid email address';
     return '';
   }
@@ -354,6 +401,52 @@ function buildRsvpHtml(
     }
     return 1;
   }
+
+  // Phone group helpers must be global for inline onclick attributes
+  window.__updPhone = function(group) {
+    var code = group.querySelector('.__phone_code');
+    var num = group.querySelector('.__phone_num');
+    var hid = group.querySelector('input[type="hidden"]');
+    if (!code || !num || !hid) return;
+    var digits = num.value.replace(/\\D/g, '');
+    hid.value = digits ? code.textContent + digits : '';
+  };
+  window.__togPhone = function(btn) {
+    var drop = btn.parentElement.querySelector('.__phone_drop');
+    var wasOpen = drop.style.display !== 'none';
+    document.querySelectorAll('.__phone_drop').forEach(function(d) { d.style.display = 'none'; });
+    if (!wasOpen) {
+      drop.style.display = 'block';
+      var s = drop.querySelector('input[type="text"]');
+      if (s) setTimeout(function() { s.focus(); s.value = ''; window.__filtPhone(s); }, 0);
+    }
+  };
+  window.__filtPhone = function(inp) {
+    var q = inp.value.toLowerCase();
+    inp.closest('.__phone_drop').querySelector('.__phone_list').querySelectorAll('li').forEach(function(li) {
+      li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  };
+  window.__selPhone = function(btn, dial, iso) {
+    var group = btn.closest('.__phone_group');
+    var flag = group.querySelector('.__phone_flag');
+    var code = group.querySelector('.__phone_code');
+    if (flag) flag.src = 'https://flagcdn.com/w20/' + iso + '.png';
+    if (code) code.textContent = dial;
+    btn.closest('.__phone_drop').style.display = 'none';
+    window.__updPhone(group);
+  };
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest || !e.target.closest('.__phone_group')) {
+      document.querySelectorAll('.__phone_drop').forEach(function(d) { d.style.display = 'none'; });
+    }
+  });
+  document.addEventListener('input', function(e) {
+    if (e.target.classList && e.target.classList.contains('__phone_num')) {
+      var g = e.target.closest && e.target.closest('.__phone_group');
+      if (g) window.__updPhone(g);
+    }
+  });
 
   initConditionals();
   initGuestGroups();
@@ -393,7 +486,7 @@ function buildRsvpHtml(
     }${
       f.type === "tel"
         ? ` else if (isConditionalVisible('${f.id}') && payload['${f.id}'] && !E164.test(payload['${f.id}'])) {
-      showError('${f.id}', 'Phone must be in E.164 format (e.g., +2348012345678)');
+      showError('${f.id}', 'Please enter a valid phone number');
       valid = false;
     }`
         : f.type === "email"

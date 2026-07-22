@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+
+<style>
+  body{margin:0;background:oklch(0.965 0.018 88);overflow-x:hidden;}
+  ::selection{background:oklch(0.72 0.11 82);color:#fff;}
+  a{color:oklch(0.5 0.09 82);}
+  a:hover{color:oklch(0.42 0.11 82);}
+  /* Details row — date · time · location inline */
+  .details-row{display:flex;align-items:stretch;justify-content:center;}
+  .details-item{padding:0 clamp(28px,5vw,64px);text-align:center;}
+  .details-item:first-child{padding-left:0;}
+  .details-item:last-child{padding-right:0;}
+  .details-sep{width:1px;background:oklch(0.82 0.06 82);flex-shrink:0;}
+
+  @media (max-width:820px){
+    .hero-grid{grid-template-columns:1fr !important;min-height:0 !important;}
+    .hero-photo{height:56vh !important;}
+    .hero-panel{padding:56px 40px !important;}
+    .schedule-row{flex-direction:column !important;gap:6px !important;}
+    .schedule-time{min-width:unset !important;}
+    /* Details rows stack on mobile */
+    .details-row{flex-direction:column;align-items:center;}
+    .details-sep{width:48px;height:1px;margin:20px auto;}
+    .details-item{padding:0 !important;}
+  }
+</style>
+
+<style id="__rsvp_styles">
+#__rsvp{padding:clamp(72px,10vw,120px) 24px;background:oklch(0.93 0.025 88);text-align:center;}
+#__rsvp h2{font-family:'Cinzel',serif;font-weight:400;font-size:clamp(30px,4.5vw,48px);color:oklch(0.3 0.04 70);margin:0 0 26px;}
+#__rsvp_form_wrap{max-width:560px;margin:0 auto;background:oklch(0.965 0.018 88);padding:clamp(32px,5vw,52px);border-top:3px solid oklch(0.72 0.11 82);box-shadow:0 12px 34px oklch(0.3 0.04 70 / 0.1);text-align:left;}
+#__rsvp form>div{margin-bottom:22px;}
+#__rsvp label:not([style]):not(:has(input[type=checkbox])):not(:has(input[type=radio])){display:block;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:oklch(0.5 0.06 70);margin-bottom:8px;text-transform:uppercase;}
+#__rsvp label:has(input[type=checkbox]){display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:14px 0;border-top:1px solid oklch(0.88 0.03 88);}
+#__rsvp label:has(input[type=checkbox]) span{font-family:'Cormorant Garamond',serif;font-size:19px;color:oklch(0.32 0.04 70);line-height:1.4;}
+#__rsvp input[type=text],#__rsvp input[type=email],#__rsvp input[type=tel],#__rsvp select,#__rsvp textarea{width:100%;box-sizing:border-box;padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:19px;color:oklch(0.28 0.03 70);background:#fff;border:1px solid oklch(0.8 0.05 82);border-radius:2px;outline:none;margin-top:6px;}
+#__rsvp input[type=text]:focus,#__rsvp input[type=email]:focus,#__rsvp input[type=tel]:focus,#__rsvp select:focus,#__rsvp textarea:focus{border-color:oklch(0.55 0.1 82);outline:none;}
+#__rsvp input[type=checkbox]{width:20px;height:20px;min-width:20px;accent-color:oklch(0.55 0.1 82);cursor:pointer;margin-top:3px;}
+#__rsvp [id^=__cond_]{padding:16px;margin-top:8px;background:oklch(0.955 0.015 88);border-left:2px solid oklch(0.78 0.08 82);}
+#__rsvp [id^=__cond_]>div{margin-bottom:14px;}
+#__rsvp [id^=__cond_] label{display:block !important;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.12em;color:oklch(0.5 0.06 70);margin-bottom:8px;text-transform:uppercase;padding:0 !important;border:none !important;}
+#__rsvp_btn{width:100%;margin-top:22px;padding:17px;font-family:'Cinzel',serif;font-size:15px;letter-spacing:0.14em;color:oklch(0.96 0.02 88);background:oklch(0.4 0.06 70);border:none;border-radius:2px;cursor:pointer;transition:background 0.2s;}
+#__rsvp_btn:hover{background:oklch(0.34 0.07 70);}
+#__rsvp_btn:disabled{opacity:.65;cursor:not-allowed;}
+#__rsvp_error{padding:10px 14px;margin-bottom:16px;background:rgba(192,57,43,.08);border-left:3px solid #c0392b;color:#c0392b;text-align:left;font-family:'Cormorant Garamond',serif;font-size:17px;}
+#__rsvp_success{padding:48px 24px;text-align:center;}
+#__rsvp_success h3{font-family:'Cinzel',serif;font-weight:400;font-size:clamp(22px,3vw,32px);color:oklch(0.3 0.04 70);margin:16px 0 12px;}
+#__rsvp_success p{font-family:'Cormorant Garamond',serif;font-size:20px;color:oklch(0.45 0.03 70);}
+[id^=__err_]{font-family:'Cormorant Garamond',serif;font-size:15px;color:#c0392b;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div style="font-family:'Cormorant Garamond',serif;background:oklch(0.965 0.018 88);color:oklch(0.28 0.03 70);">
+
+  <!-- HERO: split -->
+  <section class="hero-grid" style="display:grid;grid-template-columns:1.05fr 1fr;min-height:100vh;">
+    <div class="hero-photo" style="position:relative;overflow:hidden;background:oklch(0.9 0.02 88);min-height:320px;">
+      <img src="https://res.cloudinary.com/jsamcloud12/image/upload/v1784420412/revisaacmpamaugo/mpamaugo-celebration-hero.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;">
+    </div>
+    <div class="hero-panel" style="display:flex;flex-direction:column;justify-content:center;padding:clamp(56px,7vw,104px) clamp(52px,7vw,104px);background:oklch(0.965 0.018 88);position:relative;">
+      <div style="position:absolute;top:clamp(20px,2.6vw,36px);left:clamp(20px,2.6vw,36px);right:clamp(20px,2.6vw,36px);bottom:clamp(20px,2.6vw,36px);border:1px solid oklch(0.78 0.06 82);pointer-events:none;"></div>
+      <div style="position:relative;">
+        <div style="font-family:'Cinzel',serif;letter-spacing:0.4em;font-size:13px;color:oklch(0.55 0.1 82);margin-bottom:28px;">SAVE THE DATE</div>
+        <div style="font-family:'Cinzel',serif;font-size:15px;letter-spacing:0.15em;color:oklch(0.45 0.03 70);margin-bottom:6px;">CELEBRATING</div>
+        <h1 style="font-family:'Cinzel',serif;font-weight:500;font-size:clamp(30px,3.4vw,50px);line-height:1.15;margin:0 0 6px;color:oklch(0.32 0.04 70);">Rev. Isaac<br>&amp; Rev. Edith<br>Mpamaugo</h1>
+        <div style="width:64px;height:2px;background:oklch(0.72 0.11 82);margin:24px 0 26px;"></div>
+
+        <!-- Milestones — called out -->
+        <div style="margin-bottom:32px;">
+          <p style="font-size:clamp(20px,2.4vw,26px);margin:0 0 10px;color:oklch(0.28 0.03 70);">
+            His <strong style="font-family:'Cinzel',serif;font-size:1.2em;color:oklch(0.38 0.07 72);">80<span style="font-size:0.65em;vertical-align:super;">th</span></strong>
+            &amp; Her <strong style="font-family:'Cinzel',serif;font-size:1.2em;color:oklch(0.38 0.07 72);">70<span style="font-size:0.65em;vertical-align:super;">th</span></strong> Birthdays
+          </p>
+          <p style="font-size:clamp(20px,2.4vw,26px);margin:0;color:oklch(0.28 0.03 70);">
+            Their <strong style="font-family:'Cinzel',serif;font-size:1.2em;color:oklch(0.38 0.07 72);">48<span style="font-size:0.65em;vertical-align:super;">th</span></strong> Wedding Anniversary
+          </p>
+        </div>
+
+        <!-- Date — bigger and bolder -->
+        <div style="background:oklch(0.28 0.045 70);padding:18px 24px;display:inline-block;">
+          <p style="font-family:'Cinzel',serif;font-size:clamp(16px,2vw,22px);font-weight:600;letter-spacing:0.08em;color:oklch(0.88 0.09 82);margin:0 0 4px;">Saturday, December 26, 2026</p>
+          <p style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.18em;color:oklch(0.78 0.04 88);margin:0;">LAGOS, NIGERIA</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN -->
+  <section style="padding:60px 24px;background:oklch(0.28 0.045 70);color:oklch(0.94 0.02 88);text-align:center;">
+    <div style="font-family:'Cinzel',serif;letter-spacing:0.25em;font-size:12px;color:oklch(0.78 0.1 82);margin-bottom:26px;">THE COUNTDOWN HAS BEGUN</div>
+    <div style="display:flex;gap:clamp(20px,5vw,56px);justify-content:center;flex-wrap:wrap;">
+      <div id="__cd_days" style="min-width:80px;"><div style="font-family:'Cinzel',serif;font-size:clamp(36px,5vw,52px);font-weight:500;color:oklch(0.85 0.09 82);line-height:1;">00</div><div style="font-size:14px;letter-spacing:0.14em;text-transform:uppercase;margin-top:10px;color:oklch(0.82 0.02 88);">Days</div></div><div id="__cd_hours" style="min-width:80px;"><div style="font-family:'Cinzel',serif;font-size:clamp(36px,5vw,52px);font-weight:500;color:oklch(0.85 0.09 82);line-height:1;">00</div><div style="font-size:14px;letter-spacing:0.14em;text-transform:uppercase;margin-top:10px;color:oklch(0.82 0.02 88);">Hours</div></div><div id="__cd_minutes" style="min-width:80px;"><div style="font-family:'Cinzel',serif;font-size:clamp(36px,5vw,52px);font-weight:500;color:oklch(0.85 0.09 82);line-height:1;">00</div><div style="font-size:14px;letter-spacing:0.14em;text-transform:uppercase;margin-top:10px;color:oklch(0.82 0.02 88);">Minutes</div></div><div id="__cd_seconds" style="min-width:80px;"><div style="font-family:'Cinzel',serif;font-size:clamp(36px,5vw,52px);font-weight:500;color:oklch(0.85 0.09 82);line-height:1;">00</div><div style="font-size:14px;letter-spacing:0.14em;text-transform:uppercase;margin-top:10px;color:oklch(0.82 0.02 88);">Seconds</div></div><script>(function(){var t=new Date('2026-12-26T11:00:00+01:00').getTime();function tick(){var d=Math.max(0,t-Date.now());var dy=Math.floor(d/864e5);d-=dy*864e5;var h=Math.floor(d/36e5);d-=h*36e5;var m=Math.floor(d/6e4);d-=m*6e4;var s=Math.floor(d/1e3);[['days',dy],['hours',h],['minutes',m],['seconds',s]].forEach(function(p){var el=document.getElementById('__cd_'+p[0]);if(el)el.firstElementChild.textContent=String(p[1]).padStart(2,'0');});} tick();setInterval(tick,1000);})();</script>
+    </div>
+  </section>
+
+  <!-- EVENT DETAILS -->
+  <section style="padding:clamp(60px,8vw,100px) 24px;background:oklch(0.965 0.018 88);text-align:center;">
+    <div style="max-width:860px;margin:0 auto;">
+      <div style="font-family:'Cinzel',serif;letter-spacing:0.25em;font-size:12px;color:oklch(0.55 0.1 82);margin-bottom:44px;">CELEBRATE WITH US</div>
+      <div class="details-row">
+        <div class="details-item">
+          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE DATE</div>
+          <p style="font-family:'Cinzel',serif;font-size:clamp(17px,2vw,22px);font-weight:500;margin:0;color:oklch(0.32 0.04 70);">Saturday, December 26, 2026</p>
+        </div>
+        <div class="details-sep"></div>
+        <div class="details-item">
+          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE TIME</div>
+          <p style="font-family:'Cinzel',serif;font-size:clamp(17px,2vw,22px);font-weight:500;margin:0;color:oklch(0.32 0.04 70);">Promptly at 11:00 AM</p>
+        </div>
+        <div class="details-sep"></div>
+        <div class="details-item">
+          <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.6 0.08 82);margin-bottom:12px;">THE PLACE</div>
+          <p style="font-family:'Cinzel',serif;font-size:clamp(17px,2vw,22px);font-weight:500;margin:0;color:oklch(0.32 0.04 70);">Lagos, Nigeria</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{rsvpForm}}
+
+  <!-- SCHEDULE -->
+  <section style="padding:clamp(72px,10vw,120px) 24px;background:oklch(0.28 0.045 70);color:oklch(0.94 0.02 88);">
+    <div style="max-width:720px;margin:0 auto;text-align:center;">
+      <div style="font-family:'Cinzel',serif;letter-spacing:0.25em;font-size:12px;color:oklch(0.78 0.1 82);margin-bottom:18px;">THE PROGRAM</div>
+      <h2 style="font-family:'Cinzel',serif;font-weight:400;font-size:clamp(30px,4.5vw,48px);margin:0 0 52px;">Order of Events</h2>
+
+      <div class="schedule-row" style="display:flex;gap:32px;align-items:baseline;padding:22px 0;border-bottom:1px solid oklch(0.42 0.04 70);text-align:left;">
+        <div class="schedule-time" style="font-family:'Cinzel',serif;font-size:18px;color:oklch(0.82 0.1 82);min-width:110px;">11:00 AM</div>
+        <div>
+          <div style="font-size:22px;">Thanksgiving Service</div>
+          <div style="font-size:15px;color:oklch(0.72 0.04 88);margin-top:4px;letter-spacing:0.04em;">Opening worship &amp; prayer of gratitude</div>
+        </div>
+      </div>
+
+      <div class="schedule-row" style="display:flex;gap:32px;align-items:baseline;padding:22px 0;border-bottom:1px solid oklch(0.42 0.04 70);text-align:left;">
+        <div class="schedule-time" style="font-family:'Cinzel',serif;font-size:18px;color:oklch(0.82 0.1 82);min-width:110px;">1:00 PM</div>
+        <div>
+          <div style="font-size:22px;">Reception &amp; Luncheon</div>
+          <div style="font-size:15px;color:oklch(0.72 0.04 88);margin-top:4px;letter-spacing:0.04em;">Seated dinner with family &amp; friends</div>
+        </div>
+      </div>
+
+      <div class="schedule-row" style="display:flex;gap:32px;align-items:baseline;padding:22px 0;border-bottom:1px solid oklch(0.42 0.04 70);text-align:left;">
+        <div class="schedule-time" style="font-family:'Cinzel',serif;font-size:18px;color:oklch(0.82 0.1 82);min-width:110px;">2:30 PM</div>
+        <div>
+          <div style="font-size:22px;">Tributes &amp; Toasts</div>
+          <div style="font-size:15px;color:oklch(0.72 0.04 88);margin-top:4px;letter-spacing:0.04em;">Words of honour from family &amp; loved ones</div>
+        </div>
+      </div>
+
+      <div class="schedule-row" style="display:flex;gap:32px;align-items:baseline;padding:22px 0;border-bottom:1px solid oklch(0.42 0.04 70);text-align:left;">
+        <div class="schedule-time" style="font-family:'Cinzel',serif;font-size:18px;color:oklch(0.82 0.1 82);min-width:110px;">4:00 PM</div>
+        <div>
+          <div style="font-size:22px;">Cake Cutting &amp; Dancing</div>
+          <div style="font-size:15px;color:oklch(0.72 0.04 88);margin-top:4px;letter-spacing:0.04em;">Celebration, music &amp; fellowship</div>
+        </div>
+      </div>
+
+      <!-- Note: Following Day -->
+      <div style="margin-top:36px;padding:20px 28px;border-left:3px solid oklch(0.78 0.1 82);background:oklch(0.32 0.04 70 / 0.25);text-align:left;">
+        <p style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:oklch(0.78 0.1 82);margin:0 0 8px;text-transform:uppercase;">Also Note</p>
+        <p style="font-size:clamp(15px,1.8vw,18px);color:oklch(0.88 0.03 88);margin:0;line-height:1.7;">
+          The morning after — <strong style="font-family:'Cinzel',serif;font-weight:500;">Sunday, 27 December</strong> — join us for a Thanksgiving Church Service at <strong style="font-family:'Cinzel',serif;font-weight:500;">11:00 AM</strong> at 2/4 Bank Shonibare Street, Ojodu Berger, Lagos. <em>Open to all.</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background:oklch(0.24 0.04 70);color:oklch(0.82 0.03 88);text-align:center;padding:clamp(52px,8vw,80px) 24px 40px;">
+    <div style="max-width:560px;margin:0 auto;">
+      <!-- Ornament -->
+      <div style="font-family:'Cinzel',serif;font-size:22px;color:oklch(0.72 0.11 82);margin-bottom:24px;letter-spacing:0.3em;">✦ ✦ ✦</div>
+
+      <p style="font-family:'Cinzel',serif;font-size:clamp(18px,2.5vw,26px);font-weight:400;letter-spacing:0.08em;color:oklch(0.92 0.04 88);margin:0 0 12px;">With love &amp; gratitude,</p>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,32px);font-style:italic;color:oklch(0.85 0.09 82);margin:0 0 20px;">The Mpamaugo Family</p>
+
+      <div style="width:48px;height:1px;background:oklch(0.6 0.08 82);margin:0 auto 20px;"></div>
+
+      <p style="font-size:17px;color:oklch(0.65 0.03 88);font-style:italic;margin:0;">
+        <em>To God be all the glory.</em>
+      </p>
+    </div>
+  </footer>
+
+</div>
+
+</body></html>

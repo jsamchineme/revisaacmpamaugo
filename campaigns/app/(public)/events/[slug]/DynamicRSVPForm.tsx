@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FormField, FormConfig, FieldType } from "@/lib/form-config-types";
+import PhoneInput from "@/components/PhoneInput";
 
 interface DynamicRSVPFormProps {
   eventSlug: string;
@@ -223,7 +224,7 @@ export default function DynamicRSVPForm({
       return `${subField.label} is required`;
     }
     if (subField.type === "tel" && trimmed && !E164_REGEX.test(trimmed)) {
-      return "Phone must be in E.164 format (e.g., +2348012345678)";
+      return "Please enter a valid phone number";
     }
     if (subField.type === "email" && trimmed && !EMAIL_REGEX.test(trimmed)) {
       return "Please enter a valid email address";
@@ -244,7 +245,7 @@ export default function DynamicRSVPForm({
       }
 
       if (field.type === "tel" && typeof value === "string" && value.trim() && !E164_REGEX.test(value.trim())) {
-        errors[field.id] = "Phone must be in E.164 format (e.g., +2348012345678)";
+        errors[field.id] = "Please enter a valid phone number";
       }
 
       if (field.type === "email" && typeof value === "string" && value.trim() && !EMAIL_REGEX.test(value.trim())) {
@@ -352,6 +353,15 @@ export default function DynamicRSVPForm({
 
     const input = (() => {
       switch (subField.type) {
+        case "tel":
+          return (
+            <PhoneInput
+              value={value}
+              onChange={(v) => updateGuest(groupId, index, subField.id, v)}
+              placeholder={subField.placeholder}
+              hasError={hasError}
+            />
+          );
         case "select":
           return (
             <select
@@ -513,6 +523,17 @@ export default function DynamicRSVPForm({
           </div>
         );
       }
+
+      case "tel":
+        return (
+          <PhoneInput
+            id={field.id}
+            value={String(value)}
+            onChange={(v) => updateField(field.id, v)}
+            placeholder={field.placeholder}
+            hasError={hasError}
+          />
+        );
 
       default:
         return (
