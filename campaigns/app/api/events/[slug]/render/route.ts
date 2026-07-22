@@ -264,13 +264,16 @@ function buildRsvpHtml(
     if (val) {
       yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
       noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
-      fields.style.display = '';
+      fields.querySelectorAll('#__rsvp_fields > div').forEach(function(el) { el.style.display = ''; });
       btn.textContent = 'Register';
     } else {
       yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
       noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
-      fields.style.display = 'none';
-      btn.textContent = "Send Regrets";
+      fields.querySelectorAll('#__rsvp_fields > div').forEach(function(el) {
+        var isNameField = el.id === '__wrap_title' || el.id === '__wrap_fullname';
+        el.style.display = isNameField ? '' : 'none';
+      });
+      btn.textContent = 'Send Regrets';
     }
   };
 
@@ -494,6 +497,14 @@ function buildRsvpHtml(
     var formEl = document.getElementById('__rsvp_form');
 
     if (!__attending) {
+      var nameEl = document.getElementById('fullname');
+      var nameVal = nameEl ? nameEl.value.trim() : '';
+      if (!nameVal) {
+        showError('fullname', 'Full name is required');
+        return;
+      }
+      var titleEl = document.getElementById('title');
+      var titleVal = titleEl ? titleEl.value.trim() : '';
       var btn = document.getElementById('__rsvp_btn');
       btn.disabled = true;
       btn.textContent = 'Submitting…';
@@ -501,7 +512,7 @@ function buildRsvpHtml(
         var res = await fetch('/events/${slug}/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ attending: false, fullname: '', title: '' })
+          body: JSON.stringify({ attending: false, fullname: nameVal, title: titleVal })
         });
         var data = await res.json().catch(function() { return {}; });
         if (res.ok) {

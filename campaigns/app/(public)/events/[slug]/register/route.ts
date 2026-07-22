@@ -78,7 +78,7 @@ export async function POST(
 
     const isAttending = parsed.data.attending !== false;
 
-    if (isAttending && !parsed.data.fullname) {
+    if (!parsed.data.fullname) {
       return NextResponse.json(
         { error: "Validation failed", details: { fieldErrors: { fullname: ["Full name is required"] } } },
         { status: 400 }
