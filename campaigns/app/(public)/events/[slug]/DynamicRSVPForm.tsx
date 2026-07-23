@@ -40,7 +40,7 @@ function buildInitialGuests(count: number, subFields: FormField[]): GuestValues[
 function getNumberMax(field: FormField, queryMaxGuests: number): number | undefined {
   const absoluteMax = field.max ?? 5;
   if (field.maxFromQuery && queryMaxGuests > 0) {
-    return Math.min(queryMaxGuests, absoluteMax);
+    return Math.min(queryMaxGuests - 1, absoluteMax);
   }
   return absoluteMax;
 }
@@ -120,10 +120,19 @@ export default function DynamicRSVPForm({
 
   function isNumberInputVisible(field: FormField): boolean {
     if (field.type !== "number" || !field.maxFromQuery) return true;
-    return queryMaxGuests > 0;
+    return queryMaxGuests > 1;
+  }
+
+  function isGuestControllingCheckbox(field: FormField): boolean {
+    if (field.type !== "checkbox" || !field.conditional?.length) return false;
+    return field.conditional.some((condId) => {
+      const condField = formConfig.fields.find((f) => f.id === condId);
+      return condField?.type === "number" && condField.maxFromQuery;
+    });
   }
 
   function isFieldVisible(field: FormField): boolean {
+    if (isGuestControllingCheckbox(field) && queryMaxGuests <= 1) return false;
     const parent = getConditionalParent(field.id);
     if (parent && !conditionalVisible[parent.id]) return false;
     return isNumberInputVisible(field);

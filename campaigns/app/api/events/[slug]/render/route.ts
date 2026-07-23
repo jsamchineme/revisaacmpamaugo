@@ -67,14 +67,14 @@ function buildFieldHtml(field: FormField, numberOfInvitees: number): string {
       return `<textarea id="${field.id}" name="${field.id}" rows="3"${placeholder}></textarea>`;
 
     case "number": {
-      if (field.maxFromQuery && numberOfInvitees <= 0) {
+      if (field.maxFromQuery && numberOfInvitees <= 1) {
         return "";
       }
       const max = field.maxFromQuery && numberOfInvitees > 0
-        ? Math.min(numberOfInvitees, field.max ?? 5)
+        ? Math.min(numberOfInvitees - 1, field.max ?? 5)
         : field.max;
       const maxAttr = max !== undefined ? ` max="${max}"` : "";
-      const value = field.maxFromQuery && numberOfInvitees > 0 ? ` value="${Math.min(numberOfInvitees, field.max ?? 5)}"` : "";
+      const value = field.maxFromQuery && numberOfInvitees > 0 ? ` value="${Math.min(numberOfInvitees - 1, field.max ?? 5)}"` : "";
       return `<input type="number" id="${field.id}" name="${field.id}" min="0"${maxAttr}${value}${placeholder} />`;
     }
 
@@ -143,14 +143,17 @@ function buildRsvpHtml(
         : `<label for="${field.id}">${escapeHtml(field.label)}${field.required ? " *" : ""}</label>`;
 
       const controllerForThisField = conditionalControllerMap[field.id];
-      const preChecked =
+      const isGuestCheckbox =
         field.type === "checkbox" &&
         controllerForThisField === undefined &&
-        numberOfInvitees > 0 &&
         field.conditional?.some((condId) => {
           const cond = formConfig.fields.find((f) => f.id === condId);
           return cond?.type === "number" && cond.maxFromQuery;
         });
+      if (isGuestCheckbox && numberOfInvitees <= 1) return "";
+      const preChecked =
+        isGuestCheckbox &&
+        numberOfInvitees > 1;
 
       const fieldHtml =
         field.type === "checkbox" && preChecked
@@ -166,7 +169,7 @@ function buildRsvpHtml(
               .map((condId) => {
                 const condField = formConfig.fields.find((f) => f.id === condId);
                 if (!condField) return "";
-                if (condField.type === "number" && condField.maxFromQuery && numberOfInvitees <= 0) {
+                if (condField.type === "number" && condField.maxFromQuery && numberOfInvitees <= 1) {
                   return "";
                 }
                 if (condField.type === "guestGroup") {
@@ -259,16 +262,18 @@ function buildRsvpHtml(
     var noBtn = document.getElementById('__att_no');
     var fields = document.getElementById('__rsvp_fields');
     var btn = document.getElementById('__rsvp_btn');
-    var activeStyle = 'background:oklch(0.4 0.06 70);color:#fff;';
-    var inactiveStyle = 'background:oklch(0.94 0.015 88);color:oklch(0.45 0.03 70);';
     if (val) {
-      yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
-      noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
+      yesBtn.style.background = 'oklch(0.4 0.06 70)';
+      yesBtn.style.color = '#fff';
+      noBtn.style.background = 'oklch(0.94 0.015 88)';
+      noBtn.style.color = 'oklch(0.45 0.03 70)';
       fields.querySelectorAll('#__rsvp_fields > div').forEach(function(el) { el.style.display = ''; });
       btn.textContent = 'Register';
     } else {
-      yesBtn.style.cssText = yesBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, inactiveStyle);
-      noBtn.style.cssText = noBtn.style.cssText.replace(/background:[^;]+;color:[^;]+;/, activeStyle);
+      yesBtn.style.background = 'oklch(0.94 0.015 88)';
+      yesBtn.style.color = 'oklch(0.45 0.03 70)';
+      noBtn.style.background = 'oklch(0.4 0.06 70)';
+      noBtn.style.color = '#fff';
       fields.querySelectorAll('#__rsvp_fields > div').forEach(function(el) {
         var isNameField = el.id === '__wrap_title' || el.id === '__wrap_fullname';
         el.style.display = isNameField ? '' : 'none';

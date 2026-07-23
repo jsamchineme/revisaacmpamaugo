@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Invitation Manager",
-  description: "Manage your events and invitations",
+  title: "Triple Celebration",
+  description: "Come celebrate God's faithfulness with us",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
