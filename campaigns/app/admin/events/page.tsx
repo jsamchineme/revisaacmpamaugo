@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Toast from "@/components/admin/Toast";
 
@@ -21,6 +21,30 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenu(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function toggleMenu(e: React.MouseEvent, eventId: string) {
+    if (openMenu === eventId) {
+      setOpenMenu(null);
+      setMenuPos(null);
+    } else {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+      setOpenMenu(eventId);
+    }
+  }
 
   useEffect(() => {
     async function fetchEvents() {
@@ -139,38 +163,12 @@ export default function EventsPage() {
                     {event.capacity ?? "Unlimited"}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2 flex-wrap">
-                      <Link
-                        href={`/admin/events/${event.id}/design`}
-                        className="px-3 py-1 text-sm bg-burgundy text-white rounded hover:bg-burgundy-dark transition-colors"
-                      >
-                        Design
-                      </Link>
-                      <Link
-                        href={`/admin/events/${event.id}/form-builder`}
-                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
-                      >
-                        Form
-                      </Link>
-                      <Link
-                        href={`/admin/events/${event.id}/registrations`}
-                        className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
-                      >
-                        Registrations
-                      </Link>
-                      <Link
-                        href={`/admin/events/${event.id}/edit`}
-                        className="px-3 py-1 text-sm bg-gold text-white rounded hover:bg-gold-dark transition-colors"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => setDeleteId(event.id)}
-                        className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => toggleMenu(e, event.id)}
+                      className="px-3 py-1 text-sm border border-line rounded hover:bg-cream transition-colors"
+                    >
+                      •••
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -193,6 +191,37 @@ export default function EventsPage() {
           </div>
         )}
       </div>
+
+      {openMenu && menuPos && (
+        <div
+          ref={menuRef}
+          style={{ position: "fixed", top: menuPos.top, right: menuPos.right, zIndex: 50 }}
+          className="w-48 bg-white border border-line rounded-lg shadow-lg overflow-hidden"
+        >
+          {[
+            { label: "Design", href: `/admin/events/${openMenu}/design` },
+            { label: "Form Builder", href: `/admin/events/${openMenu}/form-builder` },
+            { label: "Registrations", href: `/admin/events/${openMenu}/registrations` },
+            { label: "Invite Links", href: `/admin/events/${openMenu}/invitation-links` },
+            { label: "Edit", href: `/admin/events/${openMenu}/edit` },
+          ].map(({ label, href }) => (
+            <Link
+              key={label}
+              href={href}
+              onClick={() => setOpenMenu(null)}
+              className="block px-4 py-2 text-sm text-ink hover:bg-cream transition-colors"
+            >
+              {label}
+            </Link>
+          ))}
+          <button
+            onClick={() => { setOpenMenu(null); setDeleteId(openMenu); }}
+            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-line"
+          >
+            Delete
+          </button>
+        </div>
+      )}
 
       {deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
