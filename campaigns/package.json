@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "env -u __NEXT_PRIVATE_STANDALONE_CONFIG -u NEXT_DEPLOYMENT_ID -u __NEXT_OPTIMIZE_FONTS -u __NEXT_PRIVATE_RUNTIME_TYPE next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma migrate deploy && prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test"
