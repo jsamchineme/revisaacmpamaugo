@@ -92,6 +92,7 @@ export default async function RootEventPage({ params, searchParams }: PageProps)
       isPast={isPast}
       isFull={isFull}
       numberOfInvitees={numberOfInvitees}
+      hideRsvp
     />
   );
 }

@@ -24,6 +24,7 @@ interface EventPageClientProps {
   isPast: boolean;
   isFull: boolean;
   numberOfInvitees?: number;
+  hideRsvp?: boolean;
 }
 
 export default function EventPageClient({
@@ -32,6 +33,7 @@ export default function EventPageClient({
   isPast,
   isFull,
   numberOfInvitees = 0,
+  hideRsvp = false,
 }: EventPageClientProps) {
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
@@ -123,7 +125,10 @@ export default function EventPageClient({
   // If there's a custom HTML design, serve it via iframe so scripts execute
   // and the RSVP form is injected server-side by the render route
   if (event.designContent) {
-    const renderQuery = numberOfInvitees > 0 ? `?noi=${numberOfInvitees}` : "";
+    const params = new URLSearchParams();
+    if (numberOfInvitees > 0) params.set("noi", String(numberOfInvitees));
+    if (hideRsvp) params.set("noRsvp", "1");
+    const renderQuery = params.size > 0 ? `?${params}` : "";
     return (
       <iframe
         src={`/api/events/${event.slug}/render${renderQuery}`}
@@ -184,10 +189,10 @@ export default function EventPageClient({
 
       <section className="py-12 md:py-16 border-t border-line bg-paper">
         <div className="mx-auto px-4" style={{ maxWidth: 760 }}>
-          {statusBar}
-          {closedMessage}
-          {spotsMessage}
-          {rsvpFormElement}
+          {!hideRsvp && statusBar}
+          {!hideRsvp && closedMessage}
+          {!hideRsvp && spotsMessage}
+          {!hideRsvp && rsvpFormElement}
           <div className="mt-12 pt-8 border-t border-line">
             <a
               href="/"

@@ -40,7 +40,7 @@ export default async function RootPage() {
         // Serve the rendered design inline so the root URL stays as /
         return (
           <iframe
-            src={`/api/events/${event.slug}/render`}
+            src={`/api/events/${event.slug}/render?noRsvp=1`}
             title="Event"
             style={{
               display: "block",

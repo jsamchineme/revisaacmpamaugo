@@ -660,6 +660,7 @@ export async function GET(
   const { slug } = await params;
   const { searchParams } = new URL(request.url);
   const numberOfInvitees = parseNumberOfInvitees(searchParams.get("noi"));
+  const noRsvp = searchParams.get("noRsvp") === "1";
 
   const event = await prisma.event.findUnique({
     where: { slug },
@@ -723,7 +724,7 @@ export async function GET(
     }
   }
 
-  const rsvpHtml = buildRsvpHtml(formConfig, slug, isPast, isFull, numberOfInvitees);
+  const rsvpHtml = noRsvp ? "" : buildRsvpHtml(formConfig, slug, isPast, isFull, numberOfInvitees);
 
   let html = event.designContent
     .replace(/\{\{eventTitle\}\}/g, event.title)
