@@ -75,7 +75,10 @@ function buildFieldHtml(field: FormField, numberOfInvitees: number): string {
         : field.max;
       const maxAttr = max !== undefined ? ` max="${max}"` : "";
       const value = field.maxFromQuery && numberOfInvitees > 0 ? ` value="${Math.min(numberOfInvitees - 1, field.max ?? 5)}"` : "";
-      return `<input type="number" id="${field.id}" name="${field.id}" min="0"${maxAttr}${value}${placeholder} />`;
+      const clampScript = max !== undefined
+        ? ` oninput="var v=parseInt(this.value,10);if(!isNaN(v)){if(v>${max})this.value=${max};if(v<0)this.value=0;}"`
+        : ` oninput="if(parseInt(this.value,10)<0)this.value=0;"`;
+      return `<input type="number" id="${field.id}" name="${field.id}" min="0"${maxAttr}${value}${placeholder}${clampScript} />`;
     }
 
     case "tel":

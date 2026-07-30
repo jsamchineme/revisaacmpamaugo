@@ -509,7 +509,12 @@ export default function DynamicRSVPForm({
             name={field.id}
             type="number"
             value={String(value)}
-            onChange={(e) => updateField(field.id, e.target.value)}
+            onChange={(e) => {
+              const raw = parseInt(e.target.value, 10);
+              if (isNaN(raw) || e.target.value === "") { updateField(field.id, ""); return; }
+              const clamped = Math.max(0, max !== undefined ? Math.min(raw, max) : raw);
+              updateField(field.id, String(clamped));
+            }}
             placeholder={field.placeholder}
             min={0}
             max={max}
