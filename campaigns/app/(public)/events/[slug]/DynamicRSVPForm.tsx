@@ -9,6 +9,7 @@ interface DynamicRSVPFormProps {
   formConfig: FormConfig;
   onSuccess: () => void;
   queryMaxGuests?: number;
+  invitationCode?: string;
 }
 
 const E164_REGEX = /^\+[1-9][0-9]{7,14}$/;
@@ -50,6 +51,7 @@ export default function DynamicRSVPForm({
   formConfig,
   onSuccess,
   queryMaxGuests = 0,
+  invitationCode,
 }: DynamicRSVPFormProps) {
   const checkboxFields = formConfig.fields.filter((f) => f.type === "checkbox" && f.conditional);
   const regularFields = formConfig.fields.filter((f) => !f.conditional || f.type !== "checkbox");
@@ -326,6 +328,8 @@ export default function DynamicRSVPForm({
       } else {
         payload.plusOneGuests = [];
       }
+
+      if (invitationCode) payload.invitationCode = invitationCode;
 
       const res = await fetch(`/events/${eventSlug}/register`, {
         method: "POST",

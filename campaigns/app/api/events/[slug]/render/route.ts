@@ -94,7 +94,8 @@ function buildRsvpHtml(
   slug: string,
   isPast: boolean,
   isFull: boolean,
-  numberOfInvitees: number
+  numberOfInvitees: number,
+  invCode = ""
 ): string {
   const isOpen = !isPast && !isFull;
 
@@ -253,6 +254,7 @@ function buildRsvpHtml(
   var guestGroups = ${guestGroupConfigJson};
   var numberFieldIds = ${numberFieldIds};
   var numberOfInvitees = ${numberOfInvitees};
+  var __invCode = ${JSON.stringify(invCode)};
   var __phoneListHtml = ${JSON.stringify(buildPhoneCountryListItems())};
   var __attending = true;
 
@@ -517,7 +519,7 @@ function buildRsvpHtml(
         var res = await fetch('/events/${slug}/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ attending: false, fullname: nameVal, title: titleVal })
+          body: JSON.stringify({ attending: false, fullname: nameVal, title: titleVal, invitationCode: __invCode || undefined })
         });
         var data = await res.json().catch(function() { return {}; });
         if (res.ok) {
@@ -610,6 +612,7 @@ function buildRsvpHtml(
     });
     payload['plusOneGuests'] = plusOneGuests;
     if (!('plusOne' in payload)) payload['plusOne'] = plusOneGuests.length > 0;
+    if (__invCode) payload['invitationCode'] = __invCode;
 
     var btn = document.getElementById('__rsvp_btn');
     btn.disabled = true;
@@ -661,6 +664,7 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const numberOfInvitees = parseNumberOfInvitees(searchParams.get("noi"));
   const noRsvp = searchParams.get("noRsvp") === "1";
+  const invCode = searchParams.get("invCode") ?? "";
 
   const event = await prisma.event.findUnique({
     where: { slug },
@@ -724,7 +728,7 @@ export async function GET(
     }
   }
 
-  const rsvpHtml = noRsvp ? "" : buildRsvpHtml(formConfig, slug, isPast, isFull, numberOfInvitees);
+  const rsvpHtml = noRsvp ? "" : buildRsvpHtml(formConfig, slug, isPast, isFull, numberOfInvitees, invCode);
 
   let html = event.designContent
     .replace(/\{\{eventTitle\}\}/g, event.title)

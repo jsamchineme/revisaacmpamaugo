@@ -92,6 +92,23 @@ export async function POST(
       );
     }
 
+    const invitationCode = typeof body.invitationCode === "string" ? body.invitationCode : null;
+    if (invitationCode) {
+      const invitation = await prisma.invitationCode.findFirst({
+        where: { eventId: event.id, code: invitationCode },
+      });
+      if (!invitation) {
+        return NextResponse.json({ error: "Invalid invitation link" }, { status: 403 });
+      }
+      const totalRequested = 1 + (parsed.data.plusOneGuests?.length ?? 0);
+      if (totalRequested > invitation.noi) {
+        return NextResponse.json(
+          { error: `Your invitation allows up to ${invitation.noi} ${invitation.noi === 1 ? "person" : "people"} (including yourself)` },
+          { status: 400 }
+        );
+      }
+    }
+
     if (isAttending && event.capacity !== null && event.capacity !== undefined) {
       const existingRegistrations = await prisma.registration.findMany({
         where: { eventId: event.id },

@@ -77,6 +77,7 @@ export default async function GuestLinkPage({ params }: PageProps) {
 
   return (
     <EventPageClient
+      invitationCode={invitation.code}
       event={{
         id: event.id,
         title: event.title,

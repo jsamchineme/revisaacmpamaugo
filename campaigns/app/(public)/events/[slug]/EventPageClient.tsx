@@ -25,6 +25,7 @@ interface EventPageClientProps {
   isFull: boolean;
   numberOfInvitees?: number;
   hideRsvp?: boolean;
+  invitationCode?: string;
 }
 
 export default function EventPageClient({
@@ -34,6 +35,7 @@ export default function EventPageClient({
   isFull,
   numberOfInvitees = 0,
   hideRsvp = false,
+  invitationCode,
 }: EventPageClientProps) {
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
 
@@ -74,6 +76,7 @@ export default function EventPageClient({
       formConfig={formConfig}
       onSuccess={() => setRsvpSuccess(true)}
       queryMaxGuests={numberOfInvitees}
+      invitationCode={invitationCode}
     />
   ) : (
     <div className="bg-cream border border-line rounded-lg p-6 text-center text-muted">
@@ -128,6 +131,7 @@ export default function EventPageClient({
     const params = new URLSearchParams();
     if (numberOfInvitees > 0) params.set("noi", String(numberOfInvitees));
     if (hideRsvp) params.set("noRsvp", "1");
+    if (invitationCode) params.set("invCode", invitationCode);
     const renderQuery = params.size > 0 ? `?${params}` : "";
     return (
       <iframe
