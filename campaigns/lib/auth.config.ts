@@ -25,6 +25,8 @@ export const authConfig: NextAuthConfig = {
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
       const isLoginPage = nextUrl.pathname === "/admin/login";
       const isVerify2faPage = nextUrl.pathname === "/admin/verify-2fa";
+      const isForgotPasswordPage = nextUrl.pathname === "/admin/forgot-password";
+      const isResetPasswordPage = nextUrl.pathname === "/admin/reset-password";
       const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
       const isVerify2faApi = nextUrl.pathname === "/api/auth/verify-2fa";
 
@@ -40,6 +42,10 @@ export const authConfig: NextAuthConfig = {
       }
 
       if (isVerify2faPage || isVerify2faApi) {
+        return true;
+      }
+
+      if (isForgotPasswordPage || isResetPasswordPage) {
         return true;
       }
 

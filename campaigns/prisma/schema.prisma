@@ -117,6 +117,14 @@ model RateLimit {
   @@unique([ip, endpoint])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model Setting {
   key       String   @id
   value     String
