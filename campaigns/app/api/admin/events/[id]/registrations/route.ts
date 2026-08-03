@@ -14,11 +14,13 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const whatsappOnly = searchParams.get("whatsappOnly") === "true";
+    const filter = searchParams.get("filter") ?? "all";
 
     const where: Record<string, unknown> = { eventId: id };
-    if (whatsappOnly) {
+    if (filter === "whatsapp") {
       where.whatsappOptIn = true;
+    } else if (filter === "no") {
+      where.customData = { contains: '"attending":false' };
     }
 
     const registrations = await prisma.registration.findMany({

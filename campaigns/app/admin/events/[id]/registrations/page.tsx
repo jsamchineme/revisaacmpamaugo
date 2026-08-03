@@ -74,7 +74,7 @@ export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [whatsappOnly, setWhatsappOnly] = useState(false);
+  const [tab, setTab] = useState<"all" | "whatsapp" | "no">("all");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -86,7 +86,7 @@ export default function RegistrationsPage() {
       try {
         const [evResp, regResp] = await Promise.all([
           fetch(`/api/admin/events/${eventId}`),
-          fetch(`/api/admin/events/${eventId}/registrations?whatsappOnly=${whatsappOnly}`),
+          fetch(`/api/admin/events/${eventId}/registrations?filter=${tab}`),
         ]);
         if (!evResp.ok) throw new Error("Failed to fetch event");
         if (!regResp.ok) throw new Error("Failed to fetch registrations");
@@ -107,7 +107,7 @@ export default function RegistrationsPage() {
       }
     }
     if (eventId) load();
-  }, [eventId, whatsappOnly]);
+  }, [eventId, tab]);
 
   // Build column list from formConfig (or fall back to defaults)
   const conditionalIds = new Set(
@@ -377,26 +377,27 @@ export default function RegistrationsPage() {
 
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
-          {(["All", "WhatsApp Group Only"] as const).map((label) => {
-            const active = label === "All" ? !whatsappOnly : whatsappOnly;
-            return (
-              <button
-                key={label}
-                onClick={() => setWhatsappOnly(label !== "All")}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  active
-                    ? label === "All" ? "bg-burgundy text-white" : "bg-green-600 text-white"
-                    : "bg-cream text-muted hover:bg-cream/80 border border-line"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
+          {([
+            { key: "all", label: "All", activeClass: "bg-burgundy text-white" },
+            { key: "whatsapp", label: "WhatsApp Group Only", activeClass: "bg-green-600 text-white" },
+            { key: "no", label: "RSVP No", activeClass: "bg-red-600 text-white" },
+          ] as const).map(({ key, label, activeClass }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                tab === key
+                  ? activeClass
+                  : "bg-cream text-muted hover:bg-cream/80 border border-line"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
         <button
           onClick={() => {
-            const url = `/api/admin/events/${eventId}/registrations/export?whatsappOnly=${whatsappOnly}`;
+            const url = `/api/admin/events/${eventId}/registrations/export?filter=${tab}`;
             window.location.href = url;
           }}
           disabled={registrations.length === 0}
