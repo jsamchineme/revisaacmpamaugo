@@ -61,6 +61,23 @@ function parseGuests(reg: Registration): Record<string, string>[] {
   return [];
 }
 
+// Names to match against when searching: the registrant plus any guest name fields
+function getSearchableNames(reg: Registration): string[] {
+  const names: string[] = [reg.fullname ?? ""];
+  for (const guest of parseGuests(reg)) {
+    for (const [key, val] of Object.entries(guest)) {
+      if (/name/i.test(key) && val != null) names.push(String(val));
+    }
+  }
+  return names;
+}
+
+function matchesSearch(reg: Registration, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return getSearchableNames(reg).some((n) => n.toLowerCase().includes(q));
+}
+
 function getGuestGroupFields(formConfig: FormConfig | null): FormField[] {
   return (formConfig?.fields ?? []).filter((f) => f.type === "guestGroup");
 }
@@ -75,6 +92,7 @@ export default function RegistrationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"all" | "whatsapp" | "no">("all");
+  const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -158,9 +176,9 @@ export default function RegistrationsPage() {
     }
   }
 
-  function getTotalCount(): number {
-    let count = registrations.length;
-    for (const reg of registrations) {
+  function getTotalCount(regs: Registration[]): number {
+    let count = regs.length;
+    for (const reg of regs) {
       count += parseGuests(reg).length > 0 && reg.plusOne ? parseGuests(reg).length : 0;
     }
     return count;
@@ -356,6 +374,8 @@ export default function RegistrationsPage() {
   }
 
   const colSpan = columns.length + 2; // +1 Registered At, +1 delete
+  const visible = registrations.filter((reg) => matchesSearch(reg, search));
+  const searching = search.trim().length > 0;
 
   return (
     <div className="space-y-4">
@@ -363,7 +383,8 @@ export default function RegistrationsPage() {
         <h1 className="text-2xl font-bold">Registrations</h1>
         {event && (
           <p className="text-sm text-muted mt-1">
-            {event.title} · {getTotalCount()} attendee{getTotalCount() !== 1 ? "s" : ""}
+            {event.title} · {getTotalCount(visible)} attendee{getTotalCount(visible) !== 1 ? "s" : ""}
+            {searching ? ` matching “${search.trim()}”` : ""}
           </p>
         )}
       </div>
@@ -411,6 +432,34 @@ export default function RegistrationsPage() {
         </button>
       </div>
 
+      <div className="relative">
+        <svg
+          className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+            d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+        </svg>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name…"
+          aria-label="Search registrations by name"
+          className="w-full pl-9 pr-20 py-2 text-sm bg-white border border-line rounded-lg focus:outline-none focus:ring-2 focus:ring-burgundy/30 focus:border-burgundy"
+        />
+        {searching && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-burgundy underline"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       <div className="bg-white rounded-lg border border-line overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px]">
@@ -432,7 +481,7 @@ export default function RegistrationsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {registrations.map((reg) => (
+              {visible.map((reg) => (
                 <>
                   <tr key={reg.id} className="hover:bg-cream/50">
                     {columns.map((col) => (
@@ -486,10 +535,21 @@ export default function RegistrationsPage() {
           </table>
         </div>
 
-        {registrations.length === 0 && (
+        {visible.length === 0 && (
           <div className="px-4 py-12 text-center text-muted">
-            <p className="text-lg font-medium mb-1">No registrations yet</p>
-            <p className="text-sm">Registrations will appear here once people RSVP for this event.</p>
+            {searching ? (
+              <>
+                <p className="text-lg font-medium mb-1">No matches</p>
+                <p className="text-sm">
+                  No registration name matches “{search.trim()}”.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-lg font-medium mb-1">No registrations yet</p>
+                <p className="text-sm">Registrations will appear here once people RSVP for this event.</p>
+              </>
+            )}
           </div>
         )}
       </div>
