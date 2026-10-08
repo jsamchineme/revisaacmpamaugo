@@ -4,6 +4,13 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { FormField, FormConfig } from "@/lib/form-config-types";
+import Select from "@/components/admin/Select";
+import {
+  DEFAULT_FILTERS,
+  RegistrationFilters,
+  Tristate,
+  filtersToQuery,
+} from "@/lib/registration-filters";
 
 interface Registration {
   id: string;
@@ -91,11 +98,13 @@ export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"all" | "whatsapp" | "no">("all");
+  const [filters, setFilters] = useState<RegistrationFilters>(DEFAULT_FILTERS);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  const query = filtersToQuery(filters);
 
   useEffect(() => {
     async function load() {
@@ -104,7 +113,7 @@ export default function RegistrationsPage() {
       try {
         const [evResp, regResp] = await Promise.all([
           fetch(`/api/admin/events/${eventId}`),
-          fetch(`/api/admin/events/${eventId}/registrations?filter=${tab}`),
+          fetch(`/api/admin/events/${eventId}/registrations?${query}`),
         ]);
         if (!evResp.ok) throw new Error("Failed to fetch event");
         if (!regResp.ok) throw new Error("Failed to fetch registrations");
@@ -125,7 +134,7 @@ export default function RegistrationsPage() {
       }
     }
     if (eventId) load();
-  }, [eventId, tab]);
+  }, [eventId, query]);
 
   // Build column list from formConfig (or fall back to defaults)
   const conditionalIds = new Set(
@@ -376,6 +385,9 @@ export default function RegistrationsPage() {
   const colSpan = columns.length + 2; // +1 Registered At, +1 delete
   const visible = registrations.filter((reg) => matchesSearch(reg, search));
   const searching = search.trim().length > 0;
+  const hasFilters = filters.rsvp !== "all" || filters.whatsapp !== "all";
+  // Declining the RSVP clears the WhatsApp opt-in, so this pairing can never match.
+  const impossibleFilters = filters.rsvp === "no" && filters.whatsapp === "yes";
 
   return (
     <div className="space-y-4">
@@ -397,28 +409,39 @@ export default function RegistrationsPage() {
       )}
 
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 flex-wrap">
           {([
-            { key: "all", label: "All", activeClass: "bg-burgundy text-white" },
-            { key: "whatsapp", label: "WhatsApp Group Only", activeClass: "bg-green-600 text-white" },
-            { key: "no", label: "RSVP No", activeClass: "bg-red-600 text-white" },
-          ] as const).map(({ key, label, activeClass }) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                tab === key
-                  ? activeClass
-                  : "bg-cream text-muted hover:bg-cream/80 border border-line"
-              }`}
-            >
-              {label}
-            </button>
+            { key: "rsvp", label: "RSVP", yes: "Attending", no: "Not attending" },
+            { key: "whatsapp", label: "WhatsApp Opt-in", yes: "Opted in", no: "Declined" },
+          ] as const).map(({ key, label, yes, no }) => (
+            <div key={key} className="flex items-center gap-2 text-sm">
+              <span className="text-muted">{label}</span>
+              <Select<Tristate>
+                label={label}
+                value={filters[key]}
+                active={filters[key] !== "all"}
+                onChange={(v) => setFilters((prev) => ({ ...prev, [key]: v }))}
+                options={[
+                  { value: "all", label: "All" },
+                  { value: "yes", label: "Yes", hint: yes },
+                  { value: "no", label: "No", hint: no },
+                ]}
+                className="min-w-[6rem]"
+              />
+            </div>
           ))}
+          {hasFilters && (
+            <button
+              onClick={() => setFilters(DEFAULT_FILTERS)}
+              className="text-xs text-muted hover:text-burgundy underline"
+            >
+              Reset
+            </button>
+          )}
         </div>
         <button
           onClick={() => {
-            const url = `/api/admin/events/${eventId}/registrations/export?filter=${tab}`;
+            const url = `/api/admin/events/${eventId}/registrations/export?${query}`;
             window.location.href = url;
           }}
           disabled={registrations.length === 0}
@@ -537,12 +560,26 @@ export default function RegistrationsPage() {
 
         {visible.length === 0 && (
           <div className="px-4 py-12 text-center text-muted">
-            {searching ? (
+            {impossibleFilters ? (
               <>
                 <p className="text-lg font-medium mb-1">No matches</p>
                 <p className="text-sm">
-                  No registration name matches “{search.trim()}”.
+                  Declining the RSVP also clears the WhatsApp opt-in, so no one can be
+                  RSVP No and opted in.
                 </p>
+              </>
+            ) : searching ? (
+              <>
+                <p className="text-lg font-medium mb-1">No matches</p>
+                <p className="text-sm">
+                  No registration name matches “{search.trim()}”
+                  {hasFilters ? " under the current filters" : ""}.
+                </p>
+              </>
+            ) : hasFilters ? (
+              <>
+                <p className="text-lg font-medium mb-1">No matches</p>
+                <p className="text-sm">No registrations match the current filters.</p>
               </>
             ) : (
               <>

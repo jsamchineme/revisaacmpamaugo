@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { parseRegistrationFilters, registrationWhere } from "@/lib/registration-filters";
 
 export async function GET(
   request: NextRequest,
@@ -14,17 +15,10 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const filter = searchParams.get("filter") ?? "all";
-
-    const where: Record<string, unknown> = { eventId: id };
-    if (filter === "whatsapp") {
-      where.whatsappOptIn = true;
-    } else if (filter === "no") {
-      where.customData = { contains: '"attending":false' };
-    }
+    const filters = parseRegistrationFilters(searchParams);
 
     const registrations = await prisma.registration.findMany({
-      where,
+      where: registrationWhere(id, filters),
       orderBy: { createdAt: "desc" },
     });
 

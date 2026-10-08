@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { FormConfig, FormField } from "@/lib/form-config-types";
+import { parseRegistrationFilters, registrationWhere } from "@/lib/registration-filters";
 
 const PRISMA_FIELDS = new Set([
   "title", "fullname", "phone", "email", "plusOne", "plusOneGuests", "whatsappOptIn",
@@ -108,7 +109,7 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const filter = searchParams.get("filter") ?? "all";
+    const filters = parseRegistrationFilters(searchParams);
 
     const event = await prisma.event.findUnique({ where: { id } });
     if (!event) {
@@ -120,12 +121,8 @@ export async function GET(
       try { formConfig = JSON.parse(event.formConfig); } catch {}
     }
 
-    const where: Record<string, unknown> = { eventId: id };
-    if (filter === "whatsapp") where.whatsappOptIn = true;
-    else if (filter === "no") where.customData = { contains: '"attending":false' };
-
     const registrations = await prisma.registration.findMany({
-      where,
+      where: registrationWhere(id, filters),
       orderBy: { createdAt: "desc" },
     });
 
